@@ -1,17 +1,13 @@
-import React from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
-} from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import AddMovieModal from './components/AddMovieModal';
 
 const App = () => {
+    const [isAddMovieModalVisible, setIsAddMovieModalVisible] = useState(false);
 
     const readMoviesButtonPressed = () => {
         console.log("Button pressed...");
+        setIsAddMovieModalVisible(true);
     };
 
     return (
@@ -21,6 +17,7 @@ const App = () => {
                 <TouchableHighlight style={styles.readMoviesListButton} onPress={readMoviesButtonPressed}>
                     <Text style={styles.readMoviesListButtonText}>Read Movies</Text>
                 </TouchableHighlight>
+                <AddMovieModal isVisible={isAddMovieModalVisible} setIsVisible={setIsAddMovieModalVisible}/>
             </View>
         </SafeAreaView>
     );
