@@ -7,12 +7,18 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "metro": "yarn stop-metro && watchman watch-del-all && react-native start --reset-cache",
+    "stop-metro": "lsof -ti tcp:8081 | xargs kill -9 || true",
+    "pods": "cd ios && pod install && cd .."
   },
   "dependencies": {
+    "axios": "^0.24.0",
+    "bson": "^4.6.2",
     "react": "17.0.1",
     "react-native": "0.64.2",
-    "react-native-mmkv-storage": "^0.6.7"
+    "react-native-get-random-values": "^1.7.2",
+    "realm": "^10.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
