@@ -1,40 +1,63 @@
-import React, { useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableHighlight } from 'react-native';
-import AddMovieModal from './components/AddMovieModal';
+import React from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, Text, FlatList,
+  TouchableHighlight, TextInput, KeyboardAvoidingView } from 'react-native';
 import RealmService from './services/Realm.service';
 
 const App = () => {
-  const [isAddMovieModalVisible, setIsAddMovieModalVisible] = useState(false);
+  const [movies, setMovies] = React.useState([]);
+  const [newMovie, setNewMovie] = React.useState("");
 
   const readMovies = async () => {
-    await RealmService.getMovies();
+    const realmMovies = await RealmService.getMovies();
+    const transformedMovies = realmMovies.map(transformRealmMovie);
+    console.log("transformedMovies", transformedMovies)
+    setMovies(transformedMovies);
   };
 
-  const showAddMovieModal = () => {
-    setIsAddMovieModalVisible(true);
+  const transformRealmMovie = (realmMovie) => {
+    return {
+      movieName: realmMovie.movie_name,
+      key: realmMovie._id
+    };
   };
 
-  const saveMovie = async (movieName) => {
-    console.log("movieName: ", movieName);
-    const isSuccess = await RealmService.addMovie(movieName);
-    if (!isSuccess) {
-      // show alert here
-      console.log("Could not save... try again");
+  const addMovie = () => {
+    RealmService.addMovie(newMovie).then(isSuccess => {
+      if (isSuccess) {
+        readMovies();
+        setNewMovie("");
+      }
+    });
+  };
+
+  React.useEffect(() => {
+    RealmService.openRealm().then(() => {
+      readMovies().catch(() => {});
+    }).catch(() => {});  
+    return () => {
+      RealmService.closeRealm();      
     }
-  };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle='light-content' />
-      <View style={styles.view}>
-        <TouchableHighlight style={styles.readMoviesListButton} onPress={readMovies}>
-          <Text style={styles.readMoviesListButtonText}>Read Movies</Text>
-        </TouchableHighlight>
-        <TouchableHighlight style={styles.readMoviesListButton} onPress={showAddMovieModal}>
+      <FlatList
+        data={movies}
+        renderItem={({item}) => {
+          return <Text style={styles.item}>{item.movieName}</Text>
+        }}
+      />
+      <KeyboardAvoidingView style={styles.addMovieRow} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <TextInput
+          style={styles.input}
+          onChangeText={setNewMovie}
+          value={newMovie}
+        />  
+       <TouchableHighlight style={styles.addMovieButton} onPress={addMovie}>
           <Text style={styles.readMoviesListButtonText}>Add Movie</Text>
         </TouchableHighlight>
-        <AddMovieModal isVisible={isAddMovieModalVisible} setIsVisible={setIsAddMovieModalVisible} onCloseCallback={saveMovie}/>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -58,6 +81,28 @@ const styles = StyleSheet.create({
   readMoviesListButtonText: {
     color: 'white',
     textAlign: 'center'
+  }, 
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+  input: {
+    height: 40,
+    margin: 10,
+    borderWidth: 1,
+    padding: 10,
+    flex: 1
+  },
+  addMovieRow: {  
+    flexDirection: "row"
+  },
+  addMovieButton: {
+    backgroundColor: 'blue',
+    height: 39,
+    margin: 10,
+    width: 100,
+    justifyContent: 'space-around'
   }
 });
 

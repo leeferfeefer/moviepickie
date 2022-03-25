@@ -20,32 +20,42 @@ const MovieSchema = {
 //   return new Realm.App(appConfig);
 // }
 
-const _openRealm = async () => {
-  let realm;
-  try {
-    realm = await Realm.open({ schema: [MovieSchema] });
-    console.log("realm path: ", realm.path);
-  } catch (error) {
-    console.log("Could not open realm: ", error);
+let realm;
+const openRealm = async () => {
+  if (!realm) {
+    try {
+      realm = await Realm.open({ schema: [MovieSchema] });
+      console.log("realm path: ", realm.path);
+    } catch (error) {
+      console.log("Could not open realm: ", error);
+    }
+  } else {
+    console.log("Realm already open!");
   }
-  return realm;
+};
+
+const closeRealm = async () => {
+  if (realm) {
+    realm.close();
+  } else {
+    console.log("Realm is not open!");
+  }
 };
 
 const addMovie = async (movieName) => {
-  let realm;
   let isSuccess = false;
   try {
-    realm = await _openRealm();
     if (realm) {
       realm.write(() => {
         realm.create("Movie", { movie_name: movieName, _id: new BSON.ObjectID() });
       });
       isSuccess = true;
+    } else {
+      console.log("Realm is not open when attempting to add movie!");
     }
   } catch (error) {
     console.log("Could not add movie: ", error);
   } finally {
-    realm?.close();
     return isSuccess;
   }
 };
@@ -54,25 +64,46 @@ const removeMovie = async (movieName) => {
   let realm;
   let isSuccess = false;
   try {
-    realm = await _openRealm();
-    const movieToRemove = await findMovie(movieName);
-    realm.write(() => {
-      realm.delete(movieToRemove);
-    });
-    isSuccess = true;
+    if (realm) {
+      const movieToRemove = await findMovie(movieName);
+      realm.write(() => {
+        realm.delete(movieToRemove);
+      });
+      isSuccess = true;
+    } else {
+      console.log("Realm is not open when attempting to delete movie!");
+    }
   } catch (error) {
     console.log("Could not remove movie: ", error);
   } finally {
-    realm?.close();
     return isSuccess;
+  }
+};
+
+const getMovies = async () => {
+  let movies;
+  try {
+    if (realm) {
+      movies = realm.objects("Movie");
+    } else {
+      console.log("Realm is not open when attempting to get movies!");
+    }
+  } catch (error) {
+    console.log("Could not get movies: ", error);
+  } finally {
+    return movies;
   }
 };
 
 const findMovie = async (movieName) => {
   let movie;
   try {
-    const movies = await getMovies();
-    movie = movies.filtered(`movie_name = '${movieName}'`)?.[0];
+    if (realm) {
+      const movies = await getMovies();
+      movie = movies.filtered(`movie_name = '${movieName}'`)?.[0];
+    } else {
+      console.log("Realm is not open when attempting to find movie!");
+    }  
   } catch (error) {
     console.log("Could not find movie: ", error);
   } finally {
@@ -80,25 +111,9 @@ const findMovie = async (movieName) => {
   }
 };
 
-const getMovies = async () => {
-  let movies;
-  let realm;
-  try {
-    realm = await _openRealm();
-    if (realm) {
-      movies = realm.objects("Movie");
-      console.log("returned movies:", movies);
-    }
-  } catch (error) {
-    console.log("Could not get movies: ", error);
-  } finally {
-    realm?.close();
-    return movies;
-  }
-};
-
-
 export default {
+  openRealm,
+  closeRealm,
   addMovie,
   removeMovie,
   getMovies,
