@@ -1,6 +1,6 @@
 import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, FlatList,
-  TouchableHighlight, TextInput, KeyboardAvoidingView } from 'react-native';
+  TouchableHighlight, TextInput, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import RealmService from './services/Realm.service';
 
 const App = () => {
@@ -30,6 +30,21 @@ const App = () => {
     });
   };
 
+  const showMovieDetail = () => {
+
+  };
+
+  const renderListItem = ({item}) => {  
+    return (
+      // <Text style={styles.item}>
+      //   {item.movieName}
+      // </Text>
+      <TouchableOpacity style={styles.listItem} onPress={showMovieDetail}>
+        <Text style={styles.listItemText}>{item.movieName}</Text>
+      </TouchableOpacity>
+    );   
+  }
+
   React.useEffect(() => {
     RealmService.openRealm().then(() => {
       readMovies().catch(() => {});
@@ -43,20 +58,20 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle='light-content' />
       <FlatList
+        style={{backgroundColor: "white"}}
         data={movies}
-        renderItem={({item}) => {
-          return <Text style={styles.item}>{item.movieName}</Text>
-        }}
+        renderItem={renderListItem}
       />
       <KeyboardAvoidingView style={styles.addMovieRow} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <TextInput
           style={styles.input}
           onChangeText={setNewMovie}
           value={newMovie}
+          placeholder="Add a movie"
         />  
-       <TouchableHighlight style={styles.addMovieButton} onPress={addMovie}>
-          <Text style={styles.readMoviesListButtonText}>Add Movie</Text>
-        </TouchableHighlight>
+       <TouchableOpacity style={styles.addMovieButton} onPress={addMovie}>
+          <Text style={styles.addMovieButtonText}>Add</Text>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -64,7 +79,8 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "gray"
   },
   view: {
     backgroundColor: 'white',
@@ -72,38 +88,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  readMoviesListButton: {
-    backgroundColor: 'blue',
-    height: 50,
-    width: 100,
-    justifyContent: 'space-around'
+  listItem: {
+    width: "100%",
+    borderBottomWidth: 1,
   },
-  readMoviesListButtonText: {
-    color: 'white',
-    textAlign: 'center'
-  }, 
-  item: {
+  listItemText: {
     padding: 10,
     fontSize: 18,
     height: 44,
+    color: "black"
   },
   input: {
     height: 40,
     margin: 10,
     borderWidth: 1,
     padding: 10,
-    flex: 1
+    flex: 1,
+    backgroundColor: "white",
+    borderRadius: 5
   },
   addMovieRow: {  
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: "gray"
   },
   addMovieButton: {
     backgroundColor: 'blue',
     height: 39,
     margin: 10,
     width: 100,
-    justifyContent: 'space-around'
-  }
+    justifyContent: 'space-around',
+    borderRadius: 5,
+    borderColor: "black",
+    borderWidth: 1
+  },
+  addMovieButtonText: {
+    color: 'white',
+    textAlign: 'center'
+  }, 
 });
 
 export default App;
