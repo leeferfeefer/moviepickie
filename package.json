@@ -1,6 +1,6 @@
 {
   "name": "moviepickie",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -13,11 +13,16 @@
     "pods": "cd ios && pod install && cd .."
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.8",
+    "@react-navigation/native-stack": "^6.5.2",
     "axios": "^0.24.0",
     "bson": "^4.6.2",
     "react": "17.0.1",
     "react-native": "0.64.2",
+    "react-native-config": "^1.4.5",
     "react-native-get-random-values": "^1.7.2",
+    "react-native-safe-area-context": "^4.2.2",
+    "react-native-screens": "^3.13.1",
     "realm": "^10.11.0"
   },
   "devDependencies": {
