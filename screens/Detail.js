@@ -1,16 +1,8 @@
 import React from 'react';
 import { StyleSheet, Modal, Text, Pressable, View } from 'react-native';
+import "../services/TMDB.service";
 
-
-const MoviePicker = () => {
-
-  const getRandomMovie = () => {
-    // get length of movies
-    // get random number (Math.random)
-    // get movie at index of random number
-    // call API to get info
-    // display info
-  };
+const Detail = () => {
 
   return (
     <View style={styles.container}>
@@ -26,4 +18,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default MoviePicker;
+export default Detail;
