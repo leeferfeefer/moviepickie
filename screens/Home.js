@@ -4,6 +4,7 @@ import { SafeAreaView, StatusBar, StyleSheet, Text, FlatList,
 import RealmService from '../services/Realm.service';
 import TMDBService from '../services/TMDB.service';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { DeviceEventEmitter } from "react-native"
 
 export default Home = ({ navigation }) => {
   const [movies, setMovies] = React.useState([]);
@@ -13,42 +14,26 @@ export default Home = ({ navigation }) => {
   const [searchMovies, setSearchMovies] = React.useState([])
   const searchField = React.useRef(null);
 
+  // TODO: Replace this with Redux
+  DeviceEventEmitter.addListener("movieAdded", () => {
+    readMovies();
+    setSearchText("");
+    // navigation.goBack();
+  });
+
   const readMovies = async () => {
     const realmMovies = await RealmService.getMovies();
-    setMovies(realmMovies.map(transformRealmMovie));
-  };
-
-  const transformRealmMovie = (realmMovie) => {
-    return {
-      movieName: realmMovie.movie_name,
-      key: realmMovie._id
-    };
-  };
-
-  const transformTMDBSearchMovie = (tmdbSearchMovie) => {
-    return {
-      movieName: tmdbSearchMovie?.original_title,
-      key: tmdbSearchMovie?.original_title,
-    }
-  };
-
-  const addMovie = () => {
-    RealmService.addMovie(newMovie).then(isSuccess => {
-      if (isSuccess) {
-        readMovies();
-        setSearchText("");
-      }
-    });
+    setMovies(realmMovies);
   };
 
   const showMovieDetail = (movie) => {
-    navigation.navigate("Detail", {name: movie.movieName});
+    navigation.navigate("Detail", { selectedMovie: movie, fromSearchList: isSearchListVisible });
   };
 
   const renderListItem = ({item}) => {  
     return (
       <TouchableOpacity style={styles.listItem} onPress={() => showMovieDetail(item)}>
-        <Text style={styles.listItemText}>{item.movieName}</Text>
+        <Text style={styles.listItemText}>{item.title}</Text>
       </TouchableOpacity>
     );   
   }
@@ -59,7 +44,7 @@ export default Home = ({ navigation }) => {
     // only get a list of movies if more than 2 letters
     if (input.length > 2) {
       const searchMoviesResult = await TMDBService.searchMovies(input);
-      setSearchMovies(searchMoviesResult.map(transformTMDBSearchMovie));
+      setSearchMovies(searchMoviesResult);
     }    
   };
 
@@ -89,7 +74,7 @@ export default Home = ({ navigation }) => {
           style={styles.input}
           onChangeText={onSearchInput}
           value={searchText}
-          placeholder="Add a movie"
+          placeholder="Search for a movie"
           onFocus={() => {
             setIsSearchListVisible(true);
             navigation.setOptions({
@@ -108,9 +93,6 @@ export default Home = ({ navigation }) => {
             });
           }}
         />  
-        <TouchableOpacity style={styles.addMovieButton} onPress={addMovie}>
-          <Text style={styles.addMovieButtonText}>Add</Text>
-        </TouchableOpacity>
       </KeyboardAvoidingView>      
     </SafeAreaView>
   );
@@ -152,20 +134,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "lightgray"
   },
-  addMovieButton: {
-    backgroundColor: 'blue',
-    height: 39,
-    margin: 10,
-    width: 100,
-    justifyContent: 'space-around',
-    borderRadius: 5,
-    borderColor: "black",
-    borderWidth: 1
-  },
-  addMovieButtonText: {
-    color: 'white',
-    textAlign: 'center'
-  }, 
   cancelButton: {
     backgroundColor: 'transparent',
     height: 39,

@@ -17,7 +17,9 @@ const App = () => {
           <RootStack.Screen 
             name="Detail" 
             component={Detail} 
-            options={({ route }) => ({ title: route.params.name})}
+            options={({ route }) => {
+              return ({ title: route.params.selectedMovie.title});            
+            }}
           />
         </RootStack.Group>
       </RootStack.Navigator>

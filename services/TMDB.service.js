@@ -1,6 +1,7 @@
 import React from 'react';
 import Config from "react-native-config";
 import axios from "axios";
+import TMDBSearchMovie from '../models/TMDB.SearchMovie';
 
 // axios.interceptors.request.use(request => {
 //   console.log('Starting Request', JSON.stringify(request));
@@ -27,7 +28,7 @@ const searchMovies = async (movieName) => {
         query: movieName
       }
     });
-    result = response.data?.results;
+    result = response.data?.results?.map(TMDBSearchMovie.create);
   } catch (error) {
     console.log("Error searching movies: ", error);
   }

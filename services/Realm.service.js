@@ -1,14 +1,20 @@
-import "react-native-get-random-values";
-import BSON from "bson";
 import Realm from "realm";
+import MPMovie from "../models/MP.Movie";
 
 const MovieSchema = {
   name: "Movie",
   properties: {
-    _id: "objectId",
-    movie_name: "string"
+    backdropPath: "string",
+    id: "int",
+    overview: "string",
+    popularity: "int",
+    posterPath: "string",
+    releaseDate: "string",
+    title: "string",
+    voteAvg: "int",
+    voteCount: "int",
   },
-  primaryKey: "_id",
+  primaryKey: "id",
 };
 
 // export function getRealmApp() {
@@ -42,12 +48,12 @@ const closeRealm = async () => {
   }
 };
 
-const addMovie = async (movieName) => {
+const addMovie = async (movie) => {
   let isSuccess = false;
   try {
     if (realm) {
       realm.write(() => {
-        realm.create("Movie", { movie_name: movieName, _id: new BSON.ObjectID() });
+        realm.create("Movie", movie);
       });
       isSuccess = true;
     } else {
@@ -91,7 +97,7 @@ const getMovies = async () => {
   } catch (error) {
     console.log("Could not get movies: ", error);
   } finally {
-    return movies;
+    return movies.map(MPMovie.create);
   }
 };
 
@@ -99,7 +105,7 @@ const findMovie = async (movieName) => {
   let movie;
   try {
     if (realm) {
-      const movies = await getMovies();
+      const movies = realm.objects("Movie");
       movie = movies.filtered(`movie_name = '${movieName}'`)?.[0];
     } else {
       console.log("Realm is not open when attempting to find movie!");
@@ -107,7 +113,7 @@ const findMovie = async (movieName) => {
   } catch (error) {
     console.log("Could not find movie: ", error);
   } finally {
-    return movie;
+    return MPMovie.create(movie);
   }
 };
 
