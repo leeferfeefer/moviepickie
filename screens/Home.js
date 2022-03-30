@@ -1,6 +1,6 @@
 import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, FlatList,
-  TextInput, KeyboardAvoidingView, TouchableOpacity, Button } from 'react-native';
+  TextInput, KeyboardAvoidingView, TouchableOpacity, Button, Image } from 'react-native';
 import RealmService from '../services/Realm.service';
 import TMDBService from '../services/TMDB.service';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -33,7 +33,8 @@ export default Home = ({ navigation }) => {
   const renderListItem = ({item}) => {  
     return (
       <TouchableOpacity style={styles.listItem} onPress={() => showMovieDetail(item)}>
-        <Text style={styles.listItemText}>{item.title}</Text>
+        <Image style={{width: 50, height: 50}} source={{uri: `${TMDBService.IMAGE_URI}${item.posterPath}`}}/>
+        <Text style={styles.listItemText}>{item.title}</Text>      
       </TouchableOpacity>
     );   
   }
@@ -113,7 +114,9 @@ const styles = StyleSheet.create({
   listItem: {
     width: "100%",
     borderBottomWidth: 1,
-    borderColor: "lightgray"
+    borderColor: "lightgray",
+    flexDirection: "row",
+    alignItems: "center"
   },
   listItemText: {
     padding: 10,

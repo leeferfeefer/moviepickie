@@ -1,5 +1,5 @@
 import Realm from "realm";
-import MPMovie from "../models/MP.Movie";
+import MPMovie from "../models/MP/Movie";
 
 const MovieSchema = {
   name: "Movie",

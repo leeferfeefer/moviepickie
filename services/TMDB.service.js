@@ -1,7 +1,8 @@
 import React from 'react';
 import Config from "react-native-config";
 import axios from "axios";
-import TMDBSearchMovie from '../models/TMDB.SearchMovie';
+import SearchMovie from '../models/TMDB/SearchMovie';
+import DetailMovie from '../models/TMDB/DetailMovie';
 
 // axios.interceptors.request.use(request => {
 //   console.log('Starting Request', JSON.stringify(request));
@@ -13,22 +14,37 @@ import TMDBSearchMovie from '../models/TMDB.SearchMovie';
 //   return response;
 // });
 
-const queryMovieInstance = axios.create({
-  baseURL: "https://api.themoviedb.org/3/search/movie",
-  timeout: 5000
+const IMAGE_URI = "https://image.tmdb.org/t/p/original";
+
+const tmdbInstance = axios.create({
+  baseURL: "https://api.themoviedb.org/3",
+  timeout: 5000,
+  params: {
+    api_key: Config.TMDB_KEY,
+  }
 });
 
 const searchMovies = async (movieName) => {
   let result = [];
   try {
-    const response = await queryMovieInstance.get("", {
+    const response = await tmdbInstance.get("/search/movie", {
       params: {
-        api_key: Config.TMDB_KEY,
         language: "en-US",
         query: movieName
       }
     });
-    result = response.data?.results?.map(TMDBSearchMovie.create);
+    result = response.data?.results?.map(SearchMovie.create);
+  } catch (error) {
+    console.log("Error searching movies: ", error);
+  }
+  return result;
+};
+
+const getMovieDetails = async (tmdbid) => {
+  let result = {};
+  try {
+    const response = await tmdbInstance.get(`/movie/${tmdbid}`);
+    result = DetailMovie.create(response.data);
   } catch (error) {
     console.log("Error searching movies: ", error);
   }
@@ -37,4 +53,6 @@ const searchMovies = async (movieName) => {
 
 export default {
   searchMovies,
+  getMovieDetails,
+  IMAGE_URI
 }
