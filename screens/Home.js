@@ -15,7 +15,7 @@ export default Home = ({ navigation }) => {
   const searchField = React.useRef(null);
 
   // TODO: Replace this with Redux
-  DeviceEventEmitter.addListener("movieAdded", () => {
+  DeviceEventEmitter.addListener("movieListChanged", () => {
     readMovies();
     setSearchText("");
     // navigation.goBack();
@@ -54,6 +54,7 @@ export default Home = ({ navigation }) => {
       readMovies().catch(() => {});
     }).catch(() => {});  
     return () => {
+      console.log("unmount?");
       RealmService.closeRealm();      
     }
   }, []);

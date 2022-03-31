@@ -43,6 +43,7 @@ const openRealm = async () => {
 const closeRealm = async () => {
   if (realm) {
     realm.close();
+    realm = null;
   } else {
     console.log("Realm is not open!");
   }
@@ -66,12 +67,11 @@ const addMovie = async (movie) => {
   }
 };
 
-const removeMovie = async (movieName) => {
-  let realm;
+const removeMovie = async (movieId) => {
   let isSuccess = false;
   try {
-    if (realm) {
-      const movieToRemove = await findMovie(movieName);
+    if (realm) {      
+      const movieToRemove = await findMovie(movieId);
       realm.write(() => {
         realm.delete(movieToRemove);
       });
@@ -97,23 +97,23 @@ const getMovies = async () => {
   } catch (error) {
     console.log("Could not get movies: ", error);
   } finally {
-    return movies.map(MPMovie.create);
+    return movies?.map(MPMovie.create);
   }
 };
 
-const findMovie = async (movieName) => {
+const findMovie = async (movieId, convert = false) => {
   let movie;
   try {
     if (realm) {
       const movies = realm.objects("Movie");
-      movie = movies.filtered(`movie_name = '${movieName}'`)?.[0];
+      movie = movies.filtered(`id = '${movieId}'`)?.[0];
     } else {
       console.log("Realm is not open when attempting to find movie!");
     }  
   } catch (error) {
     console.log("Could not find movie: ", error);
   } finally {
-    return MPMovie.create(movie);
+    return convert ? MPMovie.create(movie) : movie;
   }
 };
 

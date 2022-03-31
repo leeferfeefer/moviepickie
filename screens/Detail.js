@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Linking } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Linking, Alert } from 'react-native';
 import RealmService from '../services/Realm.service';
 import { DeviceEventEmitter } from "react-native"
 import TMDBService from '../services/TMDB.service';
@@ -8,17 +8,15 @@ const Detail = ({route}) => {
   const { selectedMovie, fromSearchList } = route.params; 
   const [ movieDetails , setMovieDetails ] = React.useState({});
   const [ isDetailsLoading, setIsDetailsLoading ] = React.useState(false);
+  const [ isAdded, setIsAdded ] = React.useState(!fromSearchList);
 
   React.useEffect(() => {
-    console.log("fromSearchList", fromSearchList);
-    // fromSearchList && 
-    getMovieDetails().catch(console.log);
+    !isAdded && getMovieDetails().catch(() => {});
   }, []);
 
   const getMovieDetails = async () => {
     setIsDetailsLoading(true);
     const details = await TMDBService.getMovieDetails(selectedMovie.id);
-    console.log("DETAILS: ", details);
     setIsDetailsLoading(false);
     setMovieDetails(details);
   };  
@@ -26,10 +24,20 @@ const Detail = ({route}) => {
   const addMovie = async () => {
     const isSuccess = await RealmService.addMovie(selectedMovie);
     if (isSuccess) {
-      // TODO: Replace this with Redux
-      DeviceEventEmitter.emit("movieAdded");
+      DeviceEventEmitter.emit("movieListChanged");
+      setIsAdded(!isAdded);
     } else {
-      // show alert of failure here
+      Alert.alert("Oopsie", "Unable to add movie");
+    }
+  };
+
+  const removeMovie = async () => {
+    const isSuccess = await RealmService.removeMovie(selectedMovie.id);
+    if (isSuccess) {
+      DeviceEventEmitter.emit("movieListChanged");
+      setIsAdded(!isAdded);
+    } else {
+      Alert.alert("Oopsie", "Unable to remove movie");
     }
   };
 
@@ -52,15 +60,17 @@ const Detail = ({route}) => {
         source={{uri: `${TMDBService.IMAGE_URI}${selectedMovie.backdropPath}`}}
       />
       <View style={styles.detailsView}>
-        <Text style={styles.descriptionText}>{`Genre: ${movieDetails?.genres?.join(", ")}`}</Text>
-        <Text style={styles.descriptionText}>{selectedMovie.overview}</Text>
-        <View style={{flexDirection: "row", flex: 1, backgroundColor: ""}}>
-        <Text style={styles.descriptionText}>{`Release Date: ${selectedMovie.releaseDate}`}</Text>
-        <Text style={styles.descriptionText}>{`Runtime: ${movieDetails?.runtime} mins`}</Text>
+        <View style={{ backgroundColor: "rrgba(118, 116, 117, 0.35)"}}>
+          <Text style={styles.descriptionText}>{`Genre: ${movieDetails?.genres?.join(", ")}`}</Text>
+          <Text style={styles.descriptionText}>{selectedMovie.overview}</Text>
+        </View>        
+        <View style={{flexDirection: "row", flex: 1, backgroundColor: "rrgba(118, 116, 117, 0.35)"}}>
+          <Text style={styles.descriptionText}>{`Release Date: ${selectedMovie.releaseDate}`}</Text>
+          <Text style={styles.descriptionText}>{`Runtime: ${movieDetails?.runtime} mins`}</Text>
         </View>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.addMovieButton} onPress={addMovie}>
-            <Text style={styles.addMovieButtonText}>{fromSearchList ? "Add" : "Remove"}</Text>
+          <TouchableOpacity style={styles.addMovieButton} onPress={isAdded ? removeMovie : addMovie}>
+            <Text style={styles.addMovieButtonText}>{isAdded ? "Remove" : "Add"}</Text>
           </TouchableOpacity>        
           {!isDetailsLoading && (
             <TouchableOpacity style={styles.addMovieButton} onPress={openIMDB}>
@@ -106,7 +116,6 @@ const styles = StyleSheet.create({
     color: "black",
     padding: 20,
     fontSize: 15,
-    backgroundColor: 'rrgba(118, 116, 117, 0.35)'
   },
   buttonRow: {
     flexDirection: "row"
