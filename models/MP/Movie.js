@@ -3,18 +3,19 @@
  * Convert Realm movie to MoviePickie movie
  */
 
-// const MovieSchema = {
+//  const MovieSchema = {
 //   name: "Movie",
 //   properties: {
 //     backdropPath: "string",
 //     id: "int",
 //     overview: "string",
-//     popularity: "int",
 //     posterPath: "string",
 //     releaseDate: "string",
 //     title: "string",
-//     voteAvg: "int",
-//     voteCount: "int",
+//     genres: "string",
+//     runtime: "int",
+//     imdbId: "string",
+//     tagline: "string"
 //   },
 //   primaryKey: "id",
 // };
@@ -28,12 +29,13 @@ const create = (realmObject) => {
     backdropPath: realmObject.backdropPath,
     id: realmObject.id,
     overview: realmObject.overview,
-    popularity: realmObject.popularity,
     posterPath: realmObject.posterPath,
     releaseDate: realmObject.releaseDate,
     title: realmObject.title,
-    voteAvg: realmObject.voteAvg,
-    voteCount: realmObject.voteCount,
+    genres: realmObject.genres,
+    runtime: realmObject.runtime,
+    imdbId: realmObject.imdbId,
+    tagline: realmObject.tagline,
   }
 };
 

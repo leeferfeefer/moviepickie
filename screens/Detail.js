@@ -10,6 +10,8 @@ const Detail = ({route}) => {
   const [ isDetailsLoading, setIsDetailsLoading ] = React.useState(false);
   const [ isAdded, setIsAdded ] = React.useState(!fromSearchList);
 
+  console.log("selectedMovie", selectedMovie)
+
   React.useEffect(() => {
     !isAdded && getMovieDetails().catch(() => {});
   }, []);
@@ -22,7 +24,7 @@ const Detail = ({route}) => {
   };  
 
   const addMovie = async () => {
-    const isSuccess = await RealmService.addMovie(selectedMovie);
+    const isSuccess = await RealmService.addMovie(selectedMovie, movieDetails);
     if (isSuccess) {
       DeviceEventEmitter.emit("movieListChanged");
       setIsAdded(!isAdded);
@@ -61,12 +63,12 @@ const Detail = ({route}) => {
       />
       <View style={styles.detailsView}>
         <View style={{ backgroundColor: "rrgba(118, 116, 117, 0.35)"}}>
-          <Text style={styles.descriptionText}>{`Genre: ${movieDetails?.genres?.join(", ")}`}</Text>
+          <Text style={styles.descriptionText}>{`Genre: ${selectedMovie?.genres ?? movieDetails?.genres}`}</Text>
           <Text style={styles.descriptionText}>{selectedMovie.overview}</Text>
         </View>        
         <View style={{flexDirection: "row", flex: 1, backgroundColor: "rrgba(118, 116, 117, 0.35)"}}>
           <Text style={styles.descriptionText}>{`Release Date: ${selectedMovie.releaseDate}`}</Text>
-          <Text style={styles.descriptionText}>{`Runtime: ${movieDetails?.runtime} mins`}</Text>
+          <Text style={styles.descriptionText}>{`Runtime: ${selectedMovie?.runtime ?? movieDetails?.runtime} mins`}</Text>
         </View>
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.addMovieButton} onPress={isAdded ? removeMovie : addMovie}>

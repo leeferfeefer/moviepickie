@@ -14,12 +14,17 @@ export default Home = ({ navigation }) => {
   const [searchMovies, setSearchMovies] = React.useState([])
   const searchField = React.useRef(null);
 
-  // TODO: Replace this with Redux
   DeviceEventEmitter.addListener("movieListChanged", () => {
     readMovies();
-    setSearchText("");
-    // navigation.goBack();
+    resetUI();
   });
+
+  const resetUI = () => {
+    navigation.setOptions({ title: "List", headerRight: undefined })
+    setSearchText("");
+    setSearchMovies([]);
+    setIsSearchListVisible(false);
+  }
 
   const readMovies = async () => {
     const realmMovies = await RealmService.getMovies();
@@ -27,6 +32,7 @@ export default Home = ({ navigation }) => {
   };
 
   const showMovieDetail = (movie) => {
+    searchField.current?.blur();
     navigation.navigate("Detail", { selectedMovie: movie, fromSearchList: isSearchListVisible });
   };
 
@@ -54,7 +60,6 @@ export default Home = ({ navigation }) => {
       readMovies().catch(() => {});
     }).catch(() => {});  
     return () => {
-      console.log("unmount?");
       RealmService.closeRealm();      
     }
   }, []);
@@ -84,10 +89,7 @@ export default Home = ({ navigation }) => {
               headerRight: () => (
                 <Button 
                   onPress={() => {
-                    navigation.setOptions({ title: "List", headerRight: undefined })
-                    setIsSearchListVisible(false);
-                    searchField.current.blur();
-                    setSearchText("");
+                    resetUI();
                   }}     
                   title="Cancel"              
                 /> 

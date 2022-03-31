@@ -70,7 +70,7 @@ const create = (dto) => {
     return;
   }
   return {
-    genres: dto.genres?.map(genre => genre?.name),
+    genres: dto.genres?.map(genre => genre?.name)?.join(", "),
     id: dto.id,
     imdbId: dto.imdb_id,
     runtime: dto.runtime,

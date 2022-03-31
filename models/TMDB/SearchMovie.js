@@ -29,12 +29,12 @@ const create = (dto) => {
     id: dto.id,
     // originalTitle: dto.original_title,
     overview: dto.overview,
-    popularity: dto.popularity,
+    // popularity: dto.popularity,
     posterPath: dto.poster_path,
     releaseDate: dto.release_date,
     title: dto.title,
-    voteAvg: dto.vote_average,
-    voteCount: dto.vote_count
+    // voteAvg: dto.vote_average,
+    // voteCount: dto.vote_count
   }
 };
 

@@ -7,12 +7,13 @@ const MovieSchema = {
     backdropPath: "string",
     id: "int",
     overview: "string",
-    popularity: "int",
     posterPath: "string",
     releaseDate: "string",
     title: "string",
-    voteAvg: "int",
-    voteCount: "int",
+    genres: "string",
+    runtime: "int",
+    imdbId: "string",
+    tagline: "string"
   },
   primaryKey: "id",
 };
@@ -49,12 +50,12 @@ const closeRealm = async () => {
   }
 };
 
-const addMovie = async (movie) => {
+const addMovie = async (movie, details) => {
   let isSuccess = false;
   try {
     if (realm) {
       realm.write(() => {
-        realm.create("Movie", movie);
+        realm.create("Movie", { ...movie, ...details });
       });
       isSuccess = true;
     } else {
