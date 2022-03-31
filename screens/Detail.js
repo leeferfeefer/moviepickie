@@ -44,7 +44,7 @@ const Detail = ({route}) => {
   };
 
   const openIMDB = () => {
-    const imdbURL = `https://www.imdb.com/title/${movieDetails?.imdbId}`;
+    const imdbURL = `https://www.imdb.com/title/${selectedMovie?.imdbId ?? movieDetails?.imdbId}`;
     Linking.canOpenURL(imdbURL).then(supported => {
       if (supported) {
         Linking.openURL(imdbURL);
