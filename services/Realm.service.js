@@ -41,7 +41,7 @@ const openRealm = async () => {
   }
 };
 
-const closeRealm = async () => {
+const closeRealm = () => {
   if (realm) {
     realm.close();
     realm = null;

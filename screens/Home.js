@@ -1,39 +1,56 @@
 import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, FlatList,
-  TextInput, KeyboardAvoidingView, TouchableOpacity, Button, Image } from 'react-native';
+  TextInput, KeyboardAvoidingView, TouchableOpacity, Button, Image, Switch } from 'react-native';
 import RealmService from '../services/Realm.service';
 import TMDBService from '../services/TMDB.service';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { DeviceEventEmitter } from "react-native"
 
+
+
+const Locations = {
+  List: "LIST",
+  External: "EXTERNAL"
+};
+
 export default Home = ({ navigation }) => {
+  const [tempMovies, setTempMovies] = React.useState([]);
   const [movies, setMovies] = React.useState([]);
   const [searchText, setSearchText] = React.useState("");
-
-  const [isSearchListVisible, setIsSearchListVisible] = React.useState(false);
-  const [searchMovies, setSearchMovies] = React.useState([])
+  const [searchLocation, setSearchLocation] = React.useState(Locations.List);
   const searchField = React.useRef(null);
 
   DeviceEventEmitter.addListener("movieListChanged", () => {
     readMovies();
-    resetUI();
   });
 
-  const resetUI = () => {
-    navigation.setOptions({ title: "List", headerRight: undefined })
-    setSearchText("");
-    setSearchMovies([]);
-    setIsSearchListVisible(false);
-  }
-
   const readMovies = async () => {
-    const realmMovies = await RealmService.getMovies();
-    setMovies(realmMovies);
+    try {
+      await RealmService.openRealm();   
+      const realmMovies = await RealmService.getMovies();
+      setMovies(realmMovies);
+    } catch (error) {
+      console.log("Could not read movies from Realm");
+    };
+    RealmService.openRealm().then(() => {
+      readMovies().catch(() => {});
+    }).catch(() => {});  
+    return () => {
+    }
   };
+
+  React.useEffect(() => {
+    const isSubscribed = true;
+    readMovies(isSubscribed);    
+    return () => {
+      isSubscribed = false;
+      RealmService.closeRealm();      
+    }
+  }, []);
 
   const showMovieDetail = (movie) => {
     searchField.current?.blur();
-    navigation.navigate("Detail", { selectedMovie: movie, fromSearchList: isSearchListVisible });
+    navigation.navigate("Detail", { selectedMovie: movie, fromSearchList: isSearchingList() });
   };
 
   const renderListItem = ({item}) => {  
@@ -47,57 +64,80 @@ export default Home = ({ navigation }) => {
 
   const onSearchInput = async (input) => {
     setSearchText(input);
-
-    // only get a list of movies if more than 2 letters
-    if (input.length > 2) {
-      const searchMoviesResult = await TMDBService.searchMovies(input);
-      setSearchMovies(searchMoviesResult);
+    let searchMoviesResult;
+    if (isSearchFromList) {
+      searchMoviesResult = movies?.filter(movie => movie.title.includes(input));
+    } else {
+      // only get a list of movies if more than 2 letters
+      if (input.length > 2) {
+        searchMoviesResult = await TMDBService.searchMovies(input);
+      }
     }    
+    console.log("Results: ", searchMoviesResult)
+    if (searchMoviesResult?.length > 1) {
+      setSearchMovies(searchMoviesResult);  
+    }         
   };
 
-  React.useEffect(() => {
-    RealmService.openRealm().then(() => {
-      readMovies().catch(() => {});
-    }).catch(() => {});  
-    return () => {
-      RealmService.closeRealm();      
-    }
-  }, []);
+  const searchInputOnFocus = () => {   
+    navigation.setOptions({
+      title: "Search",
+      headerRight: () => (
+        <Button 
+          onPress={() => {
+            // resetUI();
+          }}     
+          title="Cancel"              
+        /> 
+      ),
+    });
+  }
+
+  switchMovies = () => {
+    const temp = tempMovies;
+    setTempMovies(movies);
+    setMovies(temp);
+  };
+
+  const isSearchingList = () => {
+    return searchLocation === Locations.List;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle='light-content' />
       <FlatList
         style={{backgroundColor: "white", flex: 1, width: "100%"}}
-        data={isSearchListVisible ? searchMovies : movies}
+        data={movies}
         renderItem={renderListItem}
       />
-      <KeyboardAvoidingView 
+      {/* <KeyboardAvoidingView 
         style={styles.addMovieRow} 
         keyboardVerticalOffset={useHeaderHeight()}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        behavior={Platform.OS === "ios" ? "padding" : "height"}> */}
         <TextInput
           ref={searchField}
           style={styles.input}
           onChangeText={onSearchInput}
           value={searchText}
-          placeholder="Search for a movie"
-          onFocus={() => {
-            setIsSearchListVisible(true);
-            navigation.setOptions({
-              title: "Search",
-              headerRight: () => (
-                <Button 
-                  onPress={() => {
-                    resetUI();
-                  }}     
-                  title="Cancel"              
-                /> 
-              ),
-            });
-          }}
+          placeholder={`Search for a movie ${isSearchingList() ? "within list" : "online"}`}
+          onFocus={searchInputOnFocus}
         />  
-      </KeyboardAvoidingView>      
+        <Switch
+          style={{margin: 10}}
+          trackColor={{ false: "#81b0ff", true: "#767577"}}
+          thumbColor={isSearchingList() ? "#f4f3f4" : "#f5dd4b"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={() => {
+            switchMovies();
+            switchLocations();
+            searchField.current?.blur();
+            setSearchText("");
+            navigation.setOptions({ title: "List", headerRight: undefined });
+          }}
+          value={isSearchingList()}
+      />
+      {/* </KeyboardAvoidingView>       */}
     </SafeAreaView>
   );
 }
@@ -138,7 +178,8 @@ const styles = StyleSheet.create({
   },
   addMovieRow: {  
     flexDirection: "row",
-    backgroundColor: "lightgray"
+    backgroundColor: "lightgray",
+    alignItems: "center"
   },
   cancelButton: {
     backgroundColor: 'transparent',
