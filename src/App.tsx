@@ -4,18 +4,20 @@ import {
     StyleSheet,
     Text
 } from 'react-native';
+import { Navigation } from './components/BottomTabBar';
 
-const App = () : React.JSX.Element => {
-    return (
-        // <SafeAreaView style={backgroundStyle}>
-        //     <StatusBar
-        //         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        //         backgroundColor={backgroundStyle.backgroundColor}
-        //     />
-        // </SafeAreaView>
-        <Text>hello</Text>
+const App = (): React.JSX.Element => {
+    return (        
+        <Navigation/>
     );
 }
+
+// <SafeAreaView style={backgroundStyle}>
+            //     <StatusBar
+            //         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            //         backgroundColor={backgroundStyle.backgroundColor}
+            //     />
+            // </SafeAreaView>
 
 const styles = StyleSheet.create({});
 
