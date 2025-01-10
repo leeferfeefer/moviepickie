@@ -5,15 +5,21 @@ import { WatchedScreen } from '../screens/WatchedScreen';
 import { FindNewScreen } from '../screens/FindNewScreen';
 import { createStaticNavigation } from '@react-navigation/native';
 
+enum TabScreens {
+    Unwatched = 'Unwatched',
+    Watched = 'Watched',
+    FindNewMovie = 'Find New Movie',
+}
+
 const TabBar = createBottomTabNavigator({
     screenOptions: ({ route }) => ({
         tabBarIcon: ({ color, size }) => {
             let iconName: any;
-            if (route.name === 'Unwatched') {
+            if (route.name === TabScreens.Unwatched) {
                 iconName = 'eye-off-outline';
-            } else if (route.name === 'Watched') {
+            } else if (route.name === TabScreens.Watched) {
                 iconName = 'eye-outline';
-            } else if (route.name === 'FindNew') {
+            } else if (route.name === TabScreens.FindNewMovie) {
                 iconName = 'search-outline';
             }
             return <Icon name={iconName} size={size} color={color} />;
@@ -22,9 +28,9 @@ const TabBar = createBottomTabNavigator({
         tabBarInactiveTintColor: 'gray',
     }),
     screens: {
-        Unwatched: UnwatchedScreen,
-        Watched: WatchedScreen,
-        FindNew: FindNewScreen,
+        [TabScreens.Unwatched]: UnwatchedScreen,
+        [TabScreens.Watched]: WatchedScreen,
+        [TabScreens.FindNewMovie]: FindNewScreen,
     },
 });
 
