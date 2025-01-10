@@ -25,11 +25,4 @@ export const FindNewScreen = (): React.JSX.Element => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        // flexDirection: 'row'
-    }
-});
+const styles = StyleSheet.create({});
