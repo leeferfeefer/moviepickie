@@ -1,12 +1,17 @@
 import React from 'react';
 import { Text, StyleSheet, FlatList, ScrollView } from "react-native";
 import { SearchBar } from '../components/SearchBar';
+import { searchMovies, type MovieResults } from '../services/TMDB.service';
 
 export const FindNewScreen = (): React.JSX.Element => {
+    const [ movieResults, setMovieResults ] = React.useState<MovieResults>();
 
-    const searchNewMovieResults = (searchKeyword: string) => {
-        // make api call here
+    const searchNewMovieResults = async (searchKeyword: string) => {
         console.log("searching for: ", searchKeyword);
+        const results = await searchMovies(searchKeyword);
+        if (results) {
+            setMovieResults(results);
+        }
     };
 
     return (
