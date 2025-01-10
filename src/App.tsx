@@ -1,23 +1,37 @@
 import React from 'react';
-import {
-    // SafeAreaView,
-    StyleSheet,
-    Text
-} from 'react-native';
-import { Navigation } from './components/BottomTabBar';
+import { StyleSheet } from 'react-native';
+import { TabBar } from './components/BottomTabBar';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { MovieDetailScreen } from './screens/MovieDetailScreen';
+import { createStaticNavigation } from '@react-navigation/native';
+
+
+const Stack = createNativeStackNavigator({
+    screens: {
+        Home: {
+            screen: TabBar,
+            options: {
+                headerShown: false,
+            }
+        },
+        Detail: MovieDetailScreen,
+    },
+});
+
+export const Navigation = createStaticNavigation(Stack);
 
 const App = (): React.JSX.Element => {
-    return (        
+    return (
         <Navigation/>
     );
 }
 
 // <SafeAreaView style={backgroundStyle}>
-            //     <StatusBar
-            //         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            //         backgroundColor={backgroundStyle.backgroundColor}
-            //     />
-            // </SafeAreaView>
+//     <StatusBar
+//         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+//         backgroundColor={backgroundStyle.backgroundColor}
+//     />
+// </SafeAreaView>
 
 const styles = StyleSheet.create({});
 

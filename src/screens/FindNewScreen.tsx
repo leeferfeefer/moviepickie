@@ -6,11 +6,13 @@ import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import type { MovieResult } from '../types/MovieResult';
+import { useNavigation } from '@react-navigation/native';
 
 export const FindNewScreen = (): React.JSX.Element => {
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const prevSearchKeyword = React.useRef<string>("");
+    const navigation = useNavigation();
 
     const searchNewMovieResults = React.useCallback(async (searchKeyword: string) => {
         if (searchKeyword !== prevSearchKeyword.current) {
@@ -26,8 +28,11 @@ export const FindNewScreen = (): React.JSX.Element => {
 
     const showMovieDetails = React.useCallback(async (movieId: MovieResult["id"]) => {
         const movieDetails = await getMovieDetails(movieId);
-        console.log(movieDetails);
-        // navigate to movie details screen with movieDetails
+        if (movieDetails) {
+            console.log(movieDetails);
+            // @ts-ignore
+            navigation.navigate('Detail', movieDetails);
+        }    
     }, []);
 
     return (

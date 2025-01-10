@@ -2,11 +2,8 @@ import React from "react";
 import { TextInput, StyleSheet } from "react-native";
 
 export type SearchBarProps = {
-
     placeholder: string;
-
     onEnterPress?: (searchKeyword: string) => void;
-
     onChangeText?: (searchKeyword: string) => void;
 };
 

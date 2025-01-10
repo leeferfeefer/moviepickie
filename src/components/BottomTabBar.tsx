@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { UnwatchedScreen } from '../screens/UnwatchedScreen';
 import { WatchedScreen } from '../screens/WatchedScreen';
 import { FindNewScreen } from '../screens/FindNewScreen';
-import { createStaticNavigation } from '@react-navigation/native';
 
 enum TabScreens {
     Unwatched = 'Unwatched',
@@ -11,7 +10,12 @@ enum TabScreens {
     FindNewMovie = 'Find New Movie',
 }
 
-const TabBar = createBottomTabNavigator({
+export const TabBar = createBottomTabNavigator({
+    screens: {
+        [TabScreens.Unwatched]: UnwatchedScreen,
+        [TabScreens.Watched]: WatchedScreen,
+        [TabScreens.FindNewMovie]: FindNewScreen,
+    },
     screenOptions: ({ route }) => ({
         tabBarIcon: ({ color, size }) => {
             let iconName: any;
@@ -27,11 +31,4 @@ const TabBar = createBottomTabNavigator({
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
     }),
-    screens: {
-        [TabScreens.Unwatched]: UnwatchedScreen,
-        [TabScreens.Watched]: WatchedScreen,
-        [TabScreens.FindNewMovie]: FindNewScreen,
-    },
 });
-
-export const Navigation = createStaticNavigation(TabBar);
