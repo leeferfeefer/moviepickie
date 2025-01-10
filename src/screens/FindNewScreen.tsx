@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from "react-native";
+import { Text, StyleSheet, FlatList, ScrollView } from "react-native";
 import { SearchBar } from '../components/SearchBar';
 
 export const FindNewScreen = (): React.JSX.Element => {
