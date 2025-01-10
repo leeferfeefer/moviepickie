@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from "react-native";
 import { SearchBar } from '../components/SearchBar';
-import { searchMovies } from '../services/TMDB.service';
+import { searchMovies, getMovieDetails } from '../services/TMDB.service';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { LoadingIndicator } from '../components/LoadingIndicator';
@@ -12,18 +12,23 @@ export const FindNewScreen = (): React.JSX.Element => {
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const prevSearchKeyword = React.useRef<string>("");
 
-    const searchNewMovieResults = async (searchKeyword: string) => {
+    const searchNewMovieResults = React.useCallback(async (searchKeyword: string) => {
         if (searchKeyword !== prevSearchKeyword.current) {
-            console.log("searching for: ", searchKeyword);
             setIsLoading(true);
             const movieResults = await searchMovies(searchKeyword);
             if (movieResults) {
                 setMovieResults(movieResults.results);
-                setIsLoading(false);
                 prevSearchKeyword.current = searchKeyword;
             }
+            setIsLoading(false);
         }
-    };
+    }, []);
+
+    const showMovieDetails = React.useCallback(async (movieId: MovieResult["id"]) => {
+        const movieDetails = await getMovieDetails(movieId);
+        console.log(movieDetails);
+        // navigate to movie details screen with movieDetails
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -34,7 +39,10 @@ export const FindNewScreen = (): React.JSX.Element => {
             <MovieList
                 data={movieResults}
                 renderItem={(movieResult: MovieResult) => (
-                    <MovieListItem title={movieResult.title} />
+                    <MovieListItem
+                        title={movieResult.title}
+                        onPress={() => showMovieDetails(movieResult.id)}
+                    />
                 )}
             />
             {isLoading && <LoadingIndicator />}
@@ -44,6 +52,6 @@ export const FindNewScreen = (): React.JSX.Element => {
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
+        flex: 1,
     }
 });

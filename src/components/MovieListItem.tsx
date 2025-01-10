@@ -3,14 +3,11 @@ import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 
 type MovieListItemProps = {
     title: string;
+    onPress: () => void;
 };
 
 export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
-    const { title } = props;
-
-    const onPress = () => {
-        // show movie details
-    };
+    const { title , onPress} = props;
 
     return (
         <View style={styles.container}>
