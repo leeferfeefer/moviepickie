@@ -15,7 +15,7 @@ import { Alert } from 'react-native';
 //   return response;
 // });
 
-const IMAGE_URI = "https://image.tmdb.org/t/p/original";
+export const IMAGE_URI = "https://image.tmdb.org/t/p/original";
 
 const tmdbInstance = axios.create({
     baseURL: "https://api.themoviedb.org/3",

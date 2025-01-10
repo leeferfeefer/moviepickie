@@ -31,7 +31,7 @@ export const FindNewScreen = (): React.JSX.Element => {
         if (movieDetails) {
             console.log(movieDetails);
             // @ts-ignore
-            navigation.navigate('Detail', movieDetails);
+            navigation.navigate('Detail', { movie: movieDetails });
         }    
     }, []);
 
@@ -46,6 +46,7 @@ export const FindNewScreen = (): React.JSX.Element => {
                 renderItem={(movieResult: MovieResult) => (
                     <MovieListItem
                         title={movieResult.title}
+                        posterPath={movieResult.poster_path}
                         onPress={() => showMovieDetails(movieResult.id)}
                     />
                 )}
