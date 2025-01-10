@@ -1,16 +1,18 @@
 import React from 'react';
-import { Text, StyleSheet, FlatList, ScrollView } from "react-native";
+import { StyleSheet } from "react-native";
 import { SearchBar } from '../components/SearchBar';
-import { searchMovies, type MovieResults } from '../services/TMDB.service';
+import { searchMovies, type MovieResult } from '../services/TMDB.service';
+import { MovieList } from '../components/MovieList';
+import { MovieListItem } from '../components/MovieListItem';
 
 export const FindNewScreen = (): React.JSX.Element => {
-    const [ movieResults, setMovieResults ] = React.useState<MovieResults>();
+    const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
 
     const searchNewMovieResults = async (searchKeyword: string) => {
         console.log("searching for: ", searchKeyword);
-        const results = await searchMovies(searchKeyword);
-        if (results) {
-            setMovieResults(results);
+        const movieResults = await searchMovies(searchKeyword);
+        if (movieResults) {
+            setMovieResults(movieResults.results);
         }
     };
 
@@ -20,11 +22,11 @@ export const FindNewScreen = (): React.JSX.Element => {
                 placeholder="Search for new movie"
                 onEnterPress={searchNewMovieResults}
             />
-            <FlatList
-                data={new Array(100).fill(0)}
-                renderItem={() => <Text>Movie</Text>}
-                keyExtractor={(item, index) => index.toString()}
-
+            <MovieList
+                data={movieResults}
+                renderItem={(movieResult: MovieResult) => (
+                    <MovieListItem title={movieResult.title} />
+                )}
             />
         </>
     );
