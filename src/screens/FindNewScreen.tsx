@@ -1,23 +1,31 @@
 import React from 'react';
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SearchBar } from '../components/SearchBar';
 import { searchMovies, type MovieResult } from '../services/TMDB.service';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 export const FindNewScreen = (): React.JSX.Element => {
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
+    const prevSearchKeyword = React.useRef<string>("");
 
     const searchNewMovieResults = async (searchKeyword: string) => {
-        console.log("searching for: ", searchKeyword);
-        const movieResults = await searchMovies(searchKeyword);
-        if (movieResults) {
-            setMovieResults(movieResults.results);
+        if (searchKeyword !== prevSearchKeyword.current) {
+            console.log("searching for: ", searchKeyword);
+            setIsLoading(true);
+            const movieResults = await searchMovies(searchKeyword);
+            if (movieResults) {
+                setMovieResults(movieResults.results);
+                setIsLoading(false);
+                prevSearchKeyword.current = searchKeyword;
+            }
         }
     };
 
     return (
-        <>
+        <View style={styles.container}>
             <SearchBar
                 placeholder="Search for new movie"
                 onEnterPress={searchNewMovieResults}
@@ -28,8 +36,13 @@ export const FindNewScreen = (): React.JSX.Element => {
                     <MovieListItem title={movieResult.title} />
                 )}
             />
-        </>
+            {isLoading && <LoadingIndicator />}
+        </View>
     );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    container: {
+        // flex: 1,
+    }
+});
