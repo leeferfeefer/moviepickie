@@ -1,6 +1,8 @@
 import React from 'react';
 import Config from "react-native-config";
 import axios from "axios";
+import type { MovieDetails } from '../types/MovieDetail';
+import type { MovieResults, MovieResult } from '../types/MovieResult';
 
 // axios.interceptors.request.use(request => {
 //   console.log('Starting Request', JSON.stringify(request));
@@ -22,30 +24,6 @@ const tmdbInstance = axios.create({
     }
 });
 
-export type MovieResult = {
-    adult: boolean;
-    backdrop_path: string;
-    genre_ids: any[];
-    id: number;
-    original_language: string;
-    original_title: string;
-    overview: string;
-    popularity: number;
-    poster_path: string;
-    release_date: Date;
-    title: string;
-    video: boolean;
-    vote_average: number;
-    vote_count: number;
-}
-
-export type MovieResults = {
-    page: number;
-    results: MovieResult[];
-    total_pages: number;
-    total_results: number;
-}
-
 export const searchMovies = async (movieName: string): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get("/search/movie", {
@@ -54,6 +32,7 @@ export const searchMovies = async (movieName: string): Promise<MovieResults | un
                 query: movieName
             }
         });
+        // console.log("response: ", response.data);
         return response.data;
     } catch (error) {
         console.log("Error searching movies: ", error);
@@ -61,13 +40,13 @@ export const searchMovies = async (movieName: string): Promise<MovieResults | un
     return undefined;
 };
 
-// const getMovieDetails = async (tmdbid) => {
-//     let result = {};
-//     try {
-//         const response = await tmdbInstance.get(`/movie/${tmdbid}`);
-//         result = DetailMovie.create(response.data);
-//     } catch (error) {
-//         console.log("Error searching movies: ", error);
-//     }
-//     return result;
-// };
+export const getMovieDetails = async (movieId: MovieResult["id"]): Promise<MovieDetails | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/${movieId}`);
+        // result = DetailMovie.create(response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error getting movie detail: ", error);
+    }
+    return undefined;
+};

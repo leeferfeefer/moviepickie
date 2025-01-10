@@ -1,10 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from "react-native";
 import { SearchBar } from '../components/SearchBar';
-import { searchMovies, type MovieResult } from '../services/TMDB.service';
+import { searchMovies } from '../services/TMDB.service';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import type { MovieResult } from '../types/MovieResult';
 
 export const FindNewScreen = (): React.JSX.Element => {
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
