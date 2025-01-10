@@ -38,11 +38,11 @@ export const SearchBar = (props: SearchBarProps): React.JSX.Element => {
 
 const styles = StyleSheet.create({
     searchBar: {
-        height: 40,
         borderColor: 'gray',
         borderWidth: 1,
         paddingLeft: 10,
         width: '100%',
         backgroundColor: 'white',
+        fontSize: 25,
     },
 });
