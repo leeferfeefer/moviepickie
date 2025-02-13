@@ -1,8 +1,9 @@
 import React from "react";
-import { Text, StyleSheet, ScrollView, Image } from "react-native";
+import { Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { MovieDetails } from "../types/MovieDetail";
 import { IMAGE_URI } from "../services/TMDB.service";
+import { useMovieStore } from "../zustand/MovieStore";
 
 export type MovieDetailScreenProps = {
     route: {
@@ -16,11 +17,24 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
     const { route } = props;
     const movie = route.params.movie;
     const navigation = useNavigation();
+    const addMovie = useMovieStore((state) => state.addMovie);
+    const movies = useMovieStore((state) => state.movies);
+    const isAdded = movies.some((m) => m.id === movie.id);
+
+    const routes = navigation.getState()?.routes;
+    if (routes && routes.length) {
+        const previousRoute = routes[routes.length - 2];
+        console.log('Previous route:', previousRoute);
+    }
 
     React.useEffect(() => {
         navigation.setOptions({
             headerTitle: movie.title,
         });
+    }, []);
+
+    const addMovieToList = React.useCallback(() => {
+        addMovie(movie);
     }, []);
 
     return (
@@ -29,6 +43,13 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
                 source={{ uri: `${IMAGE_URI}${movie.poster_path}` }}
                 style={styles.poster}
             />
+            <TouchableOpacity
+                style={styles.addMovieButton}
+                onPress={addMovieToList}
+                disabled={isAdded}
+            >
+                <Text style={styles.addMovieButtonText}>{isAdded ? "Added" : "Add Movie"}</Text>
+            </TouchableOpacity>
             <Text style={styles.title}>{movie.title}</Text>
             <Text style={styles.tagline}>{movie.tagline}</Text>
             <Text style={styles.overview}>{movie.overview}</Text>
@@ -55,8 +76,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     poster: {
-        width: '100%',
-        height: 300,
+        height: 700,
         resizeMode: 'cover',
         marginBottom: 10,
     },
@@ -81,5 +101,18 @@ const styles = StyleSheet.create({
     },
     voteCount: {
         marginBottom: 50
+    },
+    addMovieButton: {
+        // flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 5,
+        borderWidth: 1,
+        marginVertical: 20,
+    },
+    addMovieButtonText: {
+        textAlign: 'center',
+        fontSize: 20,
+        padding: 10,
     }
 });
