@@ -5,11 +5,13 @@ import { MovieDetails } from '../types/MovieDetail';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { useMovieStore } from '../zustand/MovieStore';
+import { useNavigation } from '@react-navigation/native';
 
 export const UnwatchedScreen = (): React.JSX.Element => {
     const movies = useMovieStore((state) => state.movies);
     const [searchKeyword, setSearchKeyword] = React.useState("");
     const [searchMovieResults, setSearchMovieResults] = React.useState<MovieDetails[] | null>(null);
+    const navigation = useNavigation();
 
     const searchUnwatchedMovies = (searchKeyword: string) => {
         setSearchKeyword(searchKeyword);
@@ -26,6 +28,11 @@ export const UnwatchedScreen = (): React.JSX.Element => {
         setSearchMovieResults(results);
     }, [searchKeyword]);
 
+    const showMovieDetails = React.useCallback(async (movie: MovieDetails) => {
+        // @ts-ignore
+        navigation.navigate('Detail', { movie });
+    }, []);
+
     return (
         <>
             <SearchBar
@@ -38,7 +45,7 @@ export const UnwatchedScreen = (): React.JSX.Element => {
                     <MovieListItem
                         title={movie.title}
                         posterPath={movie.poster_path}
-                        onPress={() => {}}
+                        onPress={() => showMovieDetails(movie)}
                     />
                 )}
             />
