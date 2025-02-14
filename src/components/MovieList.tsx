@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, View, Text } from "react-native";
 
 type MovieListProps<T> = {
     data: T[];
@@ -11,13 +11,29 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
 
     return (
         <>
-            <FlatList
-                data={data}
-                renderItem={({ item }) => renderItem(item)}
-                keyExtractor={(_, index) => index.toString()}
-            />
+            {data.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>No movies :(</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={data}
+                    renderItem={({ item }) => renderItem(item)}
+                    keyExtractor={(_, index) => index.toString()}
+                />
+            )}
         </>
     );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    emptyText: {
+        fontSize: 40,
+        color: 'gray',
+    }
+});

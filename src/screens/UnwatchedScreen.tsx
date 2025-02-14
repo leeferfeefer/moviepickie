@@ -8,11 +8,23 @@ import { useMovieStore } from '../zustand/MovieStore';
 
 export const UnwatchedScreen = (): React.JSX.Element => {
     const movies = useMovieStore((state) => state.movies);
+    const [searchKeyword, setSearchKeyword] = React.useState("");
+    const [searchMovieResults, setSearchMovieResults] = React.useState<MovieDetails[] | null>(null);
 
     const searchUnwatchedMovies = (searchKeyword: string) => {
-        // filter out movies here
-        console.log("searching for: ", searchKeyword);
+        setSearchKeyword(searchKeyword);
     };
+
+    React.useEffect(() => {
+        if (searchKeyword.length === 0) {
+            setSearchMovieResults(null);
+        } else {
+            setSearchMovieResults(movies.filter((movie) => movie.title.toLowerCase().includes(searchKeyword.toLowerCase())));
+        }
+
+        const results = movies.filter((movie) => movie.title.toLowerCase().includes(searchKeyword.toLowerCase()));
+        setSearchMovieResults(results);
+    }, [searchKeyword]);
 
     return (
         <>
@@ -21,7 +33,7 @@ export const UnwatchedScreen = (): React.JSX.Element => {
                 onChangeText={searchUnwatchedMovies}
             />
             <MovieList
-                data={movies}
+                data={searchMovieResults ?? movies}
                 renderItem={(movie: MovieDetails) => (
                     <MovieListItem
                         title={movie.title}
