@@ -4,7 +4,7 @@ import { UnwatchedScreen } from '../screens/UnwatchedScreen';
 import { WatchedScreen } from '../screens/WatchedScreen';
 import { FindNewScreen } from '../screens/FindNewScreen';
 
-enum TabScreens {
+export enum TabScreens {
     Unwatched = 'Unwatched',
     Watched = 'Watched',
     FindNewMovie = 'Find New Movie',

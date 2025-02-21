@@ -7,6 +7,7 @@ import { MovieListItem } from '../components/MovieListItem';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import type { MovieResult } from '../types/MovieResult';
 import { useNavigation } from '@react-navigation/native';
+import { TabScreens } from "../components/BottomTabBar";
 
 export const FindNewScreen = (): React.JSX.Element => {
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
@@ -31,7 +32,7 @@ export const FindNewScreen = (): React.JSX.Element => {
         if (movieDetails) {
             console.log(movieDetails);
             // @ts-ignore
-            navigation.navigate('Detail', { movie: movieDetails });
+            navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
         }    
     }, []);
 
