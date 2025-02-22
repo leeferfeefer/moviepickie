@@ -2,20 +2,23 @@ import Icon from '@react-native-vector-icons/ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { UnwatchedScreen } from '../screens/UnwatchedScreen';
 import { WatchedScreen } from '../screens/WatchedScreen';
-import { FindNewScreen } from '../screens/FindNewScreen';
+import { FindScreen } from '../screens/FindScreen';
+import { NewScreen } from '../screens/NewScreen';
 import { RandomMovieHeaderButton } from './RandomMovieHeaderButton';
 
 export enum TabScreens {
     Unwatched = 'Unwatched',
     Watched = 'Watched',
-    FindNewMovie = 'Find New Movie',
+    Find = 'Find',
+    New = 'New',
 }
 
 export const TabBar = createBottomTabNavigator({
     screens: {
         [TabScreens.Unwatched]: UnwatchedScreen,
         [TabScreens.Watched]: WatchedScreen,
-        [TabScreens.FindNewMovie]: FindNewScreen,
+        [TabScreens.New]: NewScreen,
+        [TabScreens.Find]: FindScreen,
     },
     screenOptions: ({ route }) => ({
         tabBarIcon: ({ color, size }) => {
@@ -24,8 +27,10 @@ export const TabBar = createBottomTabNavigator({
                 iconName = 'eye-off-outline';
             } else if (route.name === TabScreens.Watched) {
                 iconName = 'eye-outline';
-            } else if (route.name === TabScreens.FindNewMovie) {
+            } else if (route.name === TabScreens.Find) {
                 iconName = 'search-outline';
+            } else if (route.name === TabScreens.New) {
+                iconName = 'newspaper-outline';
             }
             return <Icon name={iconName} size={size} color={color} />;
         },

@@ -9,7 +9,7 @@ import type { MovieResult } from '../types/MovieResult';
 import { useNavigation } from '@react-navigation/native';
 import { TabScreens } from "../components/BottomTabBar";
 
-export const FindNewScreen = (): React.JSX.Element => {
+export const FindScreen = (): React.JSX.Element => {
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const prevSearchKeyword = React.useRef<string>("");
@@ -28,9 +28,10 @@ export const FindNewScreen = (): React.JSX.Element => {
     }, []);
 
     const showMovieDetails = React.useCallback(async (movieId: MovieResult["id"]) => {
+        setIsLoading(true);
         const movieDetails = await getMovieDetails(movieId);
+        setIsLoading(false);
         if (movieDetails) {
-            console.log(movieDetails);
             // @ts-ignore
             navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
         }    

@@ -15,6 +15,7 @@
         "pods": "cd ios && pod install && cd .."
     },
     "dependencies": {
+        "@react-native-segmented-control/segmented-control": "^2.5.7",
         "@react-native-vector-icons/common": "^11.0.0",
         "@react-native-vector-icons/ionicons": "^7.4.0",
         "@react-navigation/bottom-tabs": "^7.2.0",

@@ -64,3 +64,47 @@ export const getMovieTrailerKeys = async (movieId: MovieResult["id"]): Promise<s
     }
     return undefined;
 }
+
+export const getNowPlaying = async (): Promise<MovieResults | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/now_playing`);
+        return response.data;
+    } catch (error) {
+        console.log("Error getting now playing information: ", error);
+        Alert.alert("Error", "Error getting now playing movies");
+    }
+    return undefined;
+};
+
+export const getPopular = async (): Promise<MovieResults | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/popular`);
+        return response.data;
+    } catch (error) {
+        console.log("Error getting popular information: ", error);
+        Alert.alert("Error", "Error getting popular movies");
+    }
+    return undefined;
+};
+
+export const getTopRated = async (): Promise<MovieResults | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/top_rated`);
+        return response.data;
+    } catch (error) {
+        console.log("Error getting top rated information: ", error);
+        Alert.alert("Error", "Error getting top rated movies");
+    }
+    return undefined;
+};
+
+export const getUpcoming = async (): Promise<MovieResults | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/upcoming`);
+        return response.data;
+    } catch (error) {
+        console.log("Error getting upcoming information: ", error);
+        Alert.alert("Error", "Error getting upcoming movies");
+    }
+    return undefined;
+};
