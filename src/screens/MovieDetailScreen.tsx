@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import { MovieDetails } from "../types/MovieDetail";
 import { getMovieTrailerKeys, IMAGE_URI } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
-// import Icon from '@react-native-vector-icons/ionicons';
 import YoutubePlayer from "react-native-youtube-iframe";
 import { TabScreens } from "../components/BottomTabBar";
 

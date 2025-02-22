@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { UnwatchedScreen } from '../screens/UnwatchedScreen';
 import { WatchedScreen } from '../screens/WatchedScreen';
 import { FindNewScreen } from '../screens/FindNewScreen';
+import { RandomMovieHeaderButton } from './RandomMovieHeaderButton';
 
 export enum TabScreens {
     Unwatched = 'Unwatched',
@@ -30,5 +31,14 @@ export const TabBar = createBottomTabNavigator({
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
+        headerShown: true,
+        headerTitle: "MoviePickie",
+        headerRight: () => {
+            if (route.name === TabScreens.Unwatched) {
+                return <RandomMovieHeaderButton />;
+            } else {
+                return null;
+            }
+        },
     }),
 });
