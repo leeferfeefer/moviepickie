@@ -8,8 +8,8 @@
         "lint": "eslint .",
         "start": "react-native start",
         "test": "jest",
-        "android-debug": "react-native run-android --variant debug",
-        "android-release": "react-native run-android --variant release",
+        "android-debug": "react-native run-android --mode debug",
+        "android-release": "react-native run-android --mode release",
         "metro": "yarn stop-metro && watchman watch-del-all && react-native start --reset-cache",
         "stop-metro": "lsof -ti tcp:8081 | xargs kill -9 || true",
         "pods": "cd ios && pod install && cd .."
@@ -27,6 +27,8 @@
         "react-native-mmkv": "^3.2.0",
         "react-native-safe-area-context": "^5.1.0",
         "react-native-screens": "^4.4.0",
+        "react-native-webview": "^13.13.2",
+        "react-native-youtube-iframe": "^2.3.0",
         "zustand": "^5.0.3"
     },
     "devDependencies": {

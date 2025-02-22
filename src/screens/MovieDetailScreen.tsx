@@ -1,11 +1,11 @@
 import React from "react";
-import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View } from "react-native";
+import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { MovieDetails } from "../types/MovieDetail";
-import { IMAGE_URI } from "../services/TMDB.service";
+import { getMovieTrailerKeys, IMAGE_URI } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 // import Icon from '@react-native-vector-icons/ionicons';
-import { TabScreens } from "../components/BottomTabBar";
+import YoutubePlayer from "react-native-youtube-iframe";
 
 export type MovieDetailScreenProps = {
     route: {
@@ -21,18 +21,30 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
     const { movie, prevRoute } = route.params;
     const navigation = useNavigation();
     const [isWatched, setIsWatched] = React.useState(movie.watched);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [trailerKeys, setTrailerKeys] = React.useState<string[]>([]);
 
     const addMovie = useMovieStore((state) => state.addMovie);
     const removeMovie = useMovieStore((state) => state.removeMovie);
     const toggleWatch = useMovieStore((state) => state.toggleWatch);
     const movies = useMovieStore((state) => state.movies);
     const isAdded = movies.some((m) => m.id === movie.id);
-   
+
     React.useEffect(() => {
         navigation.setOptions({
             headerTitle: movie.title,
         });
+        getTrailers();
     }, []);
+
+    const getTrailers = async () => {
+        setIsLoading(true);
+        const keys = await getMovieTrailerKeys(movie.id);
+        setIsLoading(false);
+        if (keys) {
+            setTrailerKeys(keys);
+        }
+    };
 
     const toggleAdded = React.useCallback(() => {
         if (isAdded) {
@@ -42,13 +54,13 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
         }
     }, [isAdded]);
 
-    const toggleWatched = React.useCallback(() => {        
+    const toggleWatched = React.useCallback(() => {
         if (!isAdded) {
             addMovie(movie);
         }
         toggleWatch(movie.id);
         setIsWatched(!isWatched);
-    }, [isWatched]); 
+    }, [isWatched]);
 
     return (
         <ScrollView style={styles.container}>
@@ -62,7 +74,7 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
                     onPress={toggleAdded}
                 >
                     <Text style={styles.buttonText}>{isAdded ? "Remove Movie" : "Add Movie"}</Text>
-                </TouchableOpacity>                
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.button}
                     onPress={toggleWatched}
@@ -86,6 +98,19 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
             <Text>{movie.vote_average}</Text>
             <Text style={styles.label}>Vote Count:</Text>
             <Text style={styles.voteCount}>{movie.vote_count}</Text>
+
+            <Text style={styles.label}>Trailers:</Text>
+            <ScrollView horizontal style={styles.trailerContainer}>
+                {trailerKeys.map((key, index) => (
+                    <View key={index} style={styles.trailer}>
+                        <YoutubePlayer
+                            height={300}
+                            videoId={key}
+                            play={false}
+                        />
+                    </View>
+                ))}
+            </ScrollView>
         </ScrollView>
     );
 }
@@ -121,7 +146,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     voteCount: {
-        marginBottom: 50
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -140,5 +164,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         padding: 10,
-    }
+    },
+    trailerContainer: {
+        marginTop: 20,
+        marginBottom: 50
+    },
+    trailer: {
+        width: 300,
+        height: 200,
+        marginRight: 10,
+    },
 });

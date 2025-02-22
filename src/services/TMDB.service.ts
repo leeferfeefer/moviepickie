@@ -47,7 +47,20 @@ export const getMovieDetails = async (movieId: MovieResult["id"]): Promise<Movie
         return response.data;
     } catch (error) {
         console.log("Error getting movie detail: ", error);
-        Alert.alert("Error", "Error searching movies");
+        Alert.alert("Error", "Error getting movie details");
     }
     return undefined;
 };
+
+export const getMovieTrailerKeys = async (movieId: MovieResult["id"]): Promise<string[] | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/${movieId}/videos`);
+        const data = response.data;
+        const trailers: MovieTrailerResult[] = data.results.filter((result: MovieTrailerResult) => result.type === "Trailer" && result.official && result.site === "YouTube");
+        return trailers.map(trailer => trailer.key);
+    } catch (error) {
+        console.log("Error getting movie trailer information: ", error);
+        Alert.alert("Error", "Error getting movie trailers");
+    }
+    return undefined;
+}
