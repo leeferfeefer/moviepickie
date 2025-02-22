@@ -6,6 +6,7 @@ import { getMovieTrailerKeys, IMAGE_URI } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 // import Icon from '@react-native-vector-icons/ionicons';
 import YoutubePlayer from "react-native-youtube-iframe";
+import { TabScreens } from "../components/BottomTabBar";
 
 export type MovieDetailScreenProps = {
     route: {
@@ -34,7 +35,9 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
         navigation.setOptions({
             headerTitle: movie.title,
         });
-        getTrailers();
+        if (prevRoute !== TabScreens.Watched) {
+            getTrailers();
+        }
     }, []);
 
     const getTrailers = async () => {
@@ -99,18 +102,33 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
             <Text style={styles.label}>Vote Count:</Text>
             <Text style={styles.voteCount}>{movie.vote_count}</Text>
 
-            <Text style={styles.label}>Trailers:</Text>
-            <ScrollView horizontal style={styles.trailerContainer}>
-                {trailerKeys.map((key, index) => (
-                    <View key={index} style={styles.trailer}>
-                        <YoutubePlayer
-                            height={300}
-                            videoId={key}
-                            play={false}
+            {prevRoute !== TabScreens.Watched && (
+                <>
+                    <Text style={styles.label}>Trailers:</Text>
+                    <View style={styles.trailerContainer}>
+                        <ActivityIndicator
+                            animating={isLoading}
+                            size="small"
                         />
+                        {trailerKeys.length === 0 && !isLoading && (
+                            <Text>No trailers available</Text>
+                        )}
+                        {trailerKeys.length > 0 && !isLoading && (
+                            <ScrollView horizontal style={styles.videoContainer}>
+                                {trailerKeys.map((key, index) => (
+                                    <View key={index} style={styles.trailer}>
+                                        <YoutubePlayer
+                                            height={300}
+                                            videoId={key}
+                                            play={false}
+                                        />
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        )}
                     </View>
-                ))}
-            </ScrollView>
+                </>
+            )}
         </ScrollView>
     );
 }
@@ -167,11 +185,18 @@ const styles = StyleSheet.create({
     },
     trailerContainer: {
         marginTop: 20,
-        marginBottom: 50
+        marginBottom: 50,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     trailer: {
         width: 300,
         height: 200,
         marginRight: 10,
+    },
+    videoContainer: {
+        flexDirection: 'row',
+        marginBottom: 20,
     },
 });
