@@ -10,20 +10,25 @@ import { useNavigation } from '@react-navigation/native';
 import { TabScreens } from "../components/BottomTabBar";
 
 export const FindScreen = (): React.JSX.Element => {
+    const navigation = useNavigation();
     const [movieResults, setMovieResults] = React.useState<MovieResult[]>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
+    const [currentPage, setCurrentPage] = React.useState(1);
     const prevSearchKeyword = React.useRef<string>("");
-    const navigation = useNavigation();
+
+    const getMovies = async (searchKeyword: string, page: number) => {
+        setIsLoading(true);
+        const movies = await searchMovies(searchKeyword, page);
+        if (movies) {
+            setMovieResults((prevMovieResults) => [...prevMovieResults, ...movies.results]);
+            prevSearchKeyword.current = searchKeyword;
+        }
+        setIsLoading(false);
+    };
 
     const searchNewMovieResults = React.useCallback(async (searchKeyword: string) => {
         if (searchKeyword !== prevSearchKeyword.current) {
-            setIsLoading(true);
-            const movieResults = await searchMovies(searchKeyword);
-            if (movieResults) {
-                setMovieResults(movieResults.results);
-                prevSearchKeyword.current = searchKeyword;
-            }
-            setIsLoading(false);
+            getMovies(searchKeyword, currentPage);            
         }
     }, []);
 
@@ -34,8 +39,13 @@ export const FindScreen = (): React.JSX.Element => {
         if (movieDetails) {
             // @ts-ignore
             navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
-        }    
+        }
     }, []);
+
+    const loadMoreData = React.useCallback(async () => {
+        setCurrentPage((prevPage) => prevPage + 1);
+        getMovies(prevSearchKeyword.current, currentPage);
+    }, [currentPage]);
 
     return (
         <View style={styles.container}>
@@ -52,6 +62,7 @@ export const FindScreen = (): React.JSX.Element => {
                         onPress={() => showMovieDetails(movieResult.id)}
                     />
                 )}
+                loadMoreData={loadMoreData}
             />
             {isLoading && <LoadingIndicator />}
         </View>

@@ -25,12 +25,13 @@ const tmdbInstance = axios.create({
     }
 });
 
-export const searchMovies = async (movieName: string): Promise<MovieResults | undefined> => {
+export const searchMovies = async (movieName: string, page: number = 1): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get("/search/movie", {
             params: {
                 language: "en-US",
-                query: movieName
+                query: movieName,
+                page
             }
         });
         return response.data;

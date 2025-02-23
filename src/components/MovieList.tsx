@@ -4,10 +4,11 @@ import { FlatList, StyleSheet, View, Text } from "react-native";
 type MovieListProps<T> = {
     data: T[];
     renderItem: (item: T) => React.JSX.Element;
+    loadMoreData?: () => void;
 };
 
 export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Element => {
-    const { data, renderItem } = props;
+    const { data, renderItem, loadMoreData } = props;
 
     return (
         <>
@@ -20,6 +21,8 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
                     data={data}
                     renderItem={({ item }) => renderItem(item)}
                     keyExtractor={(_, index) => index.toString()}
+                    onEndReached={loadMoreData}
+                    onEndReachedThreshold={0.1}
                 />
             )}
         </>
