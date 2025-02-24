@@ -17,11 +17,18 @@ export const WatchedScreen = (): React.JSX.Element => {
     const watchedMovies = movies.filter((movie) => movie.watched);
 
     React.useEffect(() => {
-        if (searchKeyword.length === 0) {
-            setSearchMovieResults(null);
-        } else {
-            setSearchMovieResults(watchedMovies.filter((movie) => movie.title.toLowerCase().includes(searchKeyword.toLowerCase())));
-        }        
+        let isSubscribed = true;
+        if (isSubscribed) {
+            if (searchKeyword.length === 0) {
+                setSearchMovieResults(null);
+            } else {
+                setSearchMovieResults(watchedMovies.filter((movie) => movie.title.toLowerCase().includes(searchKeyword.toLowerCase())));
+            }  
+        };
+        
+        return () => {
+            isSubscribed = false;
+        };
     }, [searchKeyword]);
 
     const searchWatchedMovies = (searchKeyword: string) => {

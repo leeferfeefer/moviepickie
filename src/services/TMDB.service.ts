@@ -66,9 +66,14 @@ export const getMovieTrailerKeys = async (movieId: MovieResult["id"]): Promise<s
     return undefined;
 }
 
-export const getNowPlaying = async (): Promise<MovieResults | undefined> => {
+export const getNowPlaying = async (page: number): Promise<MovieResults | undefined> => {
     try {
-        const response = await tmdbInstance.get(`/movie/now_playing`);
+        const response = await tmdbInstance.get(`/movie/now_playing`, {
+            params: {
+                language: "en-US",
+                page
+            }
+        });
         return response.data;
     } catch (error) {
         console.log("Error getting now playing information: ", error);
@@ -77,9 +82,14 @@ export const getNowPlaying = async (): Promise<MovieResults | undefined> => {
     return undefined;
 };
 
-export const getPopular = async (): Promise<MovieResults | undefined> => {
+export const getPopular = async (page: number): Promise<MovieResults | undefined> => {
     try {
-        const response = await tmdbInstance.get(`/movie/popular`);
+        const response = await tmdbInstance.get(`/movie/popular`, {
+            params: {
+                language: "en-US",
+                page
+            }
+        });
         return response.data;
     } catch (error) {
         console.log("Error getting popular information: ", error);
@@ -88,9 +98,14 @@ export const getPopular = async (): Promise<MovieResults | undefined> => {
     return undefined;
 };
 
-export const getTopRated = async (): Promise<MovieResults | undefined> => {
+export const getTopRated = async (page: number): Promise<MovieResults | undefined> => {
     try {
-        const response = await tmdbInstance.get(`/movie/top_rated`);
+        const response = await tmdbInstance.get(`/movie/top_rated`, {
+            params: {
+                language: "en-US",
+                page
+            }
+        });
         return response.data;
     } catch (error) {
         console.log("Error getting top rated information: ", error);
@@ -99,9 +114,14 @@ export const getTopRated = async (): Promise<MovieResults | undefined> => {
     return undefined;
 };
 
-export const getUpcoming = async (): Promise<MovieResults | undefined> => {
+export const getUpcoming = async (page: number): Promise<MovieResults | undefined> => {
     try {
-        const response = await tmdbInstance.get(`/movie/upcoming`);
+        const response = await tmdbInstance.get(`/movie/upcoming`, {
+            params: {
+                language: "en-US",
+                page
+            }
+        });
         return response.data;
     } catch (error) {
         console.log("Error getting upcoming information: ", error);

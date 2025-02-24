@@ -31,20 +31,27 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
     const isAdded = movies.some((m) => m.id === movie.id);
 
     React.useEffect(() => {
+        let isSubscribed = true;
         navigation.setOptions({
             headerTitle: movie.title,
         });
         if (prevRoute !== TabScreens.Watched) {
-            getTrailers();
+            getTrailers(isSubscribed);
         }
+
+        return () => {
+            isSubscribed = false;
+        };
     }, []);
 
-    const getTrailers = async () => {
+    const getTrailers = async (isSubscribed: boolean) => {
         setIsLoading(true);
         const keys = await getMovieTrailerKeys(movie.id);
-        setIsLoading(false);
-        if (keys) {
-            setTrailerKeys(keys);
+        if (isSubscribed) {
+            setIsLoading(false);
+            if (keys) {
+                setTrailerKeys(keys);
+            }
         }
     };
 
