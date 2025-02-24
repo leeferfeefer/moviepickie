@@ -1,14 +1,24 @@
 import React from 'react';
-import { FlatList, StyleSheet, View, Text } from "react-native";
+import { FlatList, StyleSheet, View, Text, RefreshControl } from "react-native";
 
 type MovieListProps<T> = {
     data: T[];
     renderItem: (item: T) => React.JSX.Element;
     loadMoreData?: () => void;
+    onRefresh?: () => Promise<void>;
 };
 
 export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Element => {
-    const { data, renderItem, loadMoreData } = props;
+    const { data, renderItem, loadMoreData, onRefresh } = props;
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const handleRefresh = React.useCallback(async () => {
+        if (onRefresh) {
+            setRefreshing(true);
+            await onRefresh();
+            setRefreshing(false);
+        }
+    }, [onRefresh]);
 
     return (
         <>
@@ -18,6 +28,9 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
                 </View>
             ) : (
                 <FlatList
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                    }
                     data={data}
                     renderItem={({ item }) => renderItem(item)}
                     keyExtractor={(_, index) => index.toString()}

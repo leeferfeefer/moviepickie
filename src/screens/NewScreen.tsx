@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text } from "react-native";
-import { MovieDetails } from '../types/MovieDetail';
+import { StyleSheet, RefreshControl } from "react-native";
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { useNavigation } from '@react-navigation/native';
@@ -84,6 +83,10 @@ export const NewScreen = (): React.JSX.Element => {
     // pull down to refresh...
     // need to including paging logic
 
+    const onRefresh = React.useCallback(() => {
+        fetchMovieResults(selectedMovieCategoryName, true);
+    }, [selectedIndex]);
+
     // Fetch initial movie results when tapping on segmented control
     // do not retrieve results if there are already results retrieved
     React.useEffect(() => {
@@ -146,6 +149,7 @@ export const NewScreen = (): React.JSX.Element => {
                 }}
             />
             <MovieList
+                onRefresh={onRefresh}
                 data={selectedMovieCategory.movieResults}
                 renderItem={(movieResult: MovieResult) => (
                     <MovieListItem
