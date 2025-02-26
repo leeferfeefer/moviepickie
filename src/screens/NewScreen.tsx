@@ -58,19 +58,19 @@ export const NewScreen = (): React.JSX.Element => {
     const [movieCategories, setMovieCategories] = React.useState<MovieCategories>({
         [MovieCategoryEnum.NowPlaying]: {
             movieResults: [],
-            currentPage: 1,
+            currentPage: 0,
         },
         [MovieCategoryEnum.Popular]: {
             movieResults: [],
-            currentPage: 1,
+            currentPage: 0,
         },
         [MovieCategoryEnum.TopRated]: {
             movieResults: [],
-            currentPage: 1,
+            currentPage: 0,
         },
         [MovieCategoryEnum.Upcoming]: {
             movieResults: [],
-            currentPage: 1,
+            currentPage: 0,
         },
     });
 
@@ -80,12 +80,9 @@ export const NewScreen = (): React.JSX.Element => {
     const selectedMovieCategoryName = movieCategoryNames[selectedIndex];
     const selectedMovieCategory = movieCategories[selectedMovieCategoryName];
 
-    // pull down to refresh...
-    // need to including paging logic
-
-    const onRefresh = React.useCallback(() => {
-        fetchMovieResults(selectedMovieCategoryName, true);
-    }, [selectedIndex]);
+    const onRefresh = () => {
+        return fetchMovieResults(selectedMovieCategoryName, true, 1, true);
+    };
 
     // Fetch initial movie results when tapping on segmented control
     // do not retrieve results if there are already results retrieved
@@ -93,7 +90,7 @@ export const NewScreen = (): React.JSX.Element => {
         let isSubscribed = true;
 
         if (selectedMovieCategory.movieResults.length === 0) {
-            fetchMovieResults(selectedMovieCategoryName, isSubscribed);
+            fetchMovieResults(selectedMovieCategoryName, isSubscribed, 1);
         }
 
         return () => {
@@ -101,22 +98,22 @@ export const NewScreen = (): React.JSX.Element => {
         };
     }, [selectedIndex]);
 
-    const fetchMovieResults = async (selectedMovieCategoryName: MovieCategoryEnum, isSubscribed: boolean) => {
+    const fetchMovieResults = async (selectedMovieCategoryName: MovieCategoryEnum, isSubscribed: boolean, page: number, onRefresh?: boolean) => {        
         setIsLoading(true);
-
-        const newMovieResults = await retrieveMovieResultsMap[selectedMovieCategoryName].retrieveResults(selectedMovieCategory.currentPage);
+        const newMovieResults = await retrieveMovieResultsMap[selectedMovieCategoryName].retrieveResults(page);
+        const movieResultsToMerge = onRefresh ? [] : selectedMovieCategory.movieResults;
 
         if (isSubscribed) {
             if (newMovieResults) {
                 setMovieCategories({
-                    ...movieCategories, 
+                    ...movieCategories,
                     [selectedMovieCategoryName]: {
-                        ...movieCategories[selectedMovieCategoryName],
                         movieResults: [
-                            ...movieCategories[selectedMovieCategoryName].movieResults, 
+                            ...movieResultsToMerge,
                             ...newMovieResults.results,
                         ],
-                    },                                
+                        currentPage: page,
+                    },
                 });
             }
             setIsLoading(false);
@@ -132,11 +129,14 @@ export const NewScreen = (): React.JSX.Element => {
         const movieDetails = await getMovieDetails(movieId);
         setIsLoading(false);
         if (movieDetails) {
-            console.log(movieDetails);
             // @ts-ignore
             navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
         }
     }, []);
+
+    const loadMoreData = React.useCallback(() => {
+        fetchMovieResults(selectedMovieCategoryName, true, selectedMovieCategory.currentPage + 1);
+    }, [selectedMovieCategory.currentPage]);
 
     return (
         <>
@@ -150,6 +150,7 @@ export const NewScreen = (): React.JSX.Element => {
             />
             <MovieList
                 onRefresh={onRefresh}
+                loadMoreData={loadMoreData}
                 data={selectedMovieCategory.movieResults}
                 renderItem={(movieResult: MovieResult) => (
                     <MovieListItem

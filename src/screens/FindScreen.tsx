@@ -42,7 +42,7 @@ export const FindScreen = (): React.JSX.Element => {
         }
     }, []);
 
-    const loadMoreData = React.useCallback(async () => {
+    const loadMoreData = React.useCallback(() => {
         setCurrentPage((prevPage) => prevPage + 1);
         getMovies(prevSearchKeyword.current, currentPage);
     }, [currentPage]);
