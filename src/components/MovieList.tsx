@@ -20,6 +20,15 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
         }
     }, [onRefresh]);
 
+    const refreshControl = (
+        onRefresh ? 
+        <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="gray"
+        /> : undefined
+    );
+
     return (
         <>
             {data.length === 0 ? (
@@ -28,9 +37,7 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
                 </View>
             ) : (
                 <FlatList
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-                    }
+                    refreshControl={refreshControl}
                     data={data}
                     renderItem={({ item }) => renderItem(item)}
                     keyExtractor={(_, index) => index.toString()}
