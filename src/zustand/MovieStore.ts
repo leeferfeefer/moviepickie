@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { zustandStorage } from '../services/MMKV.service';
-import { MovieDetails } from '../types/MovieDetail';
 
 type MovieStore = {
     movies: MovieDetails[];

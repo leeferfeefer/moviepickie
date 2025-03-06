@@ -1,7 +1,6 @@
 import React from "react";
 import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-import { MovieDetails } from "../types/MovieDetail";
 import { getMovieTrailerKeys, IMAGE_URI } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";

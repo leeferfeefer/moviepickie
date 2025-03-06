@@ -1,4 +1,4 @@
-export type MovieDetails = {
+type MovieDetails = {
     adult: boolean;
     backdrop_path: string;
     belongs_to_collection: BelongsToCollection;
@@ -28,31 +28,31 @@ export type MovieDetails = {
     watched: boolean;
 }
 
-export type BelongsToCollection = {
+type BelongsToCollection = {
     id: number;
     name: string;
     poster_path: string;
     backdrop_path: string;
 }
 
-export type Genre = {
+type Genre = {
     id: number;
     name: string;
 }
 
-export type ProductionCompany = {
+type ProductionCompany = {
     id: number;
     logo_path: null | string;
     name: string;
     origin_country: string;
 }
 
-export type ProductionCountry = {
+type ProductionCountry = {
     iso_3166_1: string;
     name: string;
 }
 
-export type SpokenLanguage = {
+type SpokenLanguage = {
     english_name: string;
     iso_639_1: string;
     name: string;

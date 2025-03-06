@@ -18,7 +18,6 @@ export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
                 style={styles.button}
                 onPress={onPress}
             >
-
                 <View style={styles.imageContainer}>
                     {isLoading && (
                         <ActivityIndicator

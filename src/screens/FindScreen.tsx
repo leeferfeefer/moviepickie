@@ -5,7 +5,6 @@ import { searchMovies, getMovieDetails } from '../services/TMDB.service';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { LoadingIndicator } from '../components/FullScreenLoader';
-import type { MovieResult } from '../types/MovieResult';
 import { useNavigation } from '@react-navigation/native';
 import { TabScreens } from "../components/BottomTabBar";
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet } from "react-native";
 import { SearchBar } from '../components/SearchBar';
-import { MovieDetails } from '../types/MovieDetail';
 import { MovieList } from '../components/MovieList';
 import { MovieListItem } from '../components/MovieListItem';
 import { useMovieStore } from '../zustand/MovieStore';

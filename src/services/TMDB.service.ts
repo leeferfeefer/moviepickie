@@ -1,8 +1,5 @@
-import React from 'react';
 import Config from "react-native-config";
 import axios from "axios";
-import type { MovieDetails } from '../types/MovieDetail';
-import type { MovieResults, MovieResult } from '../types/MovieResult';
 import { Alert } from 'react-native';
 
 // axios.interceptors.request.use(request => {
@@ -25,7 +22,7 @@ const tmdbInstance = axios.create({
     }
 });
 
-export const searchMovies = async (movieName: string, page: number = 1): Promise<MovieResults | undefined> => {
+export const searchMovies = async (movieName: MovieResult["title"], page: number = 1): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get("/search/movie", {
             params: {
@@ -126,6 +123,21 @@ export const getUpcoming = async (page: number): Promise<MovieResults | undefine
     } catch (error) {
         console.log("Error getting upcoming information: ", error);
         Alert.alert("Error", "Error getting upcoming movies");
+    }
+    return undefined;
+};
+
+export const getMovieCredits = async (movieId: MovieResult["id"]): Promise<MovieCredits | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/${movieId}/credits`, {
+            params: {
+                language: "en-US",
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error getting movie credits information: ", error);
+        Alert.alert("Error", "Error getting movie credits");
     }
     return undefined;
 };

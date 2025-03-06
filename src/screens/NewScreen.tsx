@@ -5,7 +5,6 @@ import { MovieListItem } from '../components/MovieListItem';
 import { useNavigation } from '@react-navigation/native';
 import { TabScreens } from "../components/BottomTabBar";
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { MovieResult, MovieResults } from '../types/MovieResult';
 import { getMovieDetails, getNowPlaying, getPopular, getTopRated, getUpcoming } from '../services/TMDB.service';
 import { LoadingIndicator } from '../components/FullScreenLoader';
 

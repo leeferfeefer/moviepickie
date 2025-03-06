@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useMovieStore } from '../zustand/MovieStore';
 import { MovieListItem } from '../components/MovieListItem';
 import { MovieList } from '../components/MovieList';
-import { MovieDetails } from '../types/MovieDetail';
 import { TabScreens } from "../components/BottomTabBar";
 
 export const WatchedScreen = (): React.JSX.Element => {
