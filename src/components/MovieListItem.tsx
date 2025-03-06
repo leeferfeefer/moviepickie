@@ -34,7 +34,6 @@ export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
                     />
                 </View>                
                 <Text style={styles.text}>{title}</Text>
-
             </TouchableOpacity>
         </View>
     );

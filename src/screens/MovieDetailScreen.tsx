@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator, FlatList } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-import { getMovieTrailerKeys, IMAGE_URI } from "../services/TMDB.service";
+import { getMovieTrailerKeys, IMAGE_URI, getMovieCredits } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { TabScreens } from "../components/BottomTabBar";
@@ -22,6 +22,8 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
     const [isWatched, setIsWatched] = React.useState(movie.watched);
     const [isLoading, setIsLoading] = React.useState(false);
     const [trailerKeys, setTrailerKeys] = React.useState<string[]>([]);
+    const [actors, setActors] = React.useState<Cast[]>([]);
+    const [loadingCastImages, setLoadingCastImages] = React.useState<{ [key: string]: boolean }>({});
 
     const addMovie = useMovieStore((state) => state.addMovie);
     const removeMovie = useMovieStore((state) => state.removeMovie);
@@ -38,6 +40,8 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
             getTrailers(isSubscribed);
         }
 
+        getCredits(isSubscribed);
+
         return () => {
             isSubscribed = false;
         };
@@ -46,13 +50,20 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
     const getTrailers = async (isSubscribed: boolean) => {
         setIsLoading(true);
         const keys = await getMovieTrailerKeys(movie.id);
-        if (isSubscribed) {
+        if (isSubscribed && keys) {
+            setTrailerKeys(keys);
             setIsLoading(false);
-            if (keys) {
-                setTrailerKeys(keys);
-            }
         }
     };
+
+    const getCredits = async (isSubscribed: boolean) => {
+        setIsLoading(true);
+        const credits = await getMovieCredits(movie.id);
+        if (isSubscribed && credits) {
+            setActors(credits.cast);
+            setIsLoading(false);
+        }
+    }
 
     const toggleAdded = React.useCallback(() => {
         if (isAdded) {
@@ -69,6 +80,14 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
         toggleWatch(movie.id);
         setIsWatched(!isWatched);
     }, [isWatched]);
+
+    const handleCastImageLoadStart = (id: string) => {
+        setLoadingCastImages((prevState) => ({ ...prevState, [id]: true }));
+    };
+
+    const handleCastImageLoadEnd = (id: string) => {
+        setLoadingCastImages((prevState) => ({ ...prevState, [id]: false }));
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -134,6 +153,36 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
                     </View>
                 </>
             )}
+
+            <Text style={styles.label}>Cast:</Text>
+            <FlatList
+                data={actors}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.castItem}>
+                        <View style={styles.imageContainer}>
+                            {loadingCastImages[item.id] && (
+                                <ActivityIndicator
+                                    style={styles.loadingIndicator}
+                                    size="small"
+                                    color="#0000ff"
+                                />
+                            )}
+                            <Image
+                                source={{ uri: `${IMAGE_URI}${item.profile_path}` }}
+                                style={styles.castImage}
+                                onLoadStart={() => handleCastImageLoadStart(item.id.toString())}
+                                onLoadEnd={() => handleCastImageLoadEnd(item.id.toString())}
+                            />
+                        </View>
+                        <Text style={styles.castName}>{item.name}</Text>
+                        <Text style={styles.castCharacter}>{item.character}</Text>
+                    </View>
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.castList}
+            />
         </ScrollView>
     );
 }
@@ -190,7 +239,6 @@ const styles = StyleSheet.create({
     },
     trailerContainer: {
         marginTop: 20,
-        marginBottom: 50,
         alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'center',
@@ -203,5 +251,39 @@ const styles = StyleSheet.create({
     videoContainer: {
         flexDirection: 'row',
         marginBottom: 20,
+    },
+    castList: {
+        marginTop: 20,
+        marginBottom: 50,
+    },
+    castItem: {
+        marginRight: 10,
+        alignItems: 'center',
+        width: 100,
+    },
+    imageContainer: {
+        position: 'relative',
+        width: 80,
+        height: 80,
+    },
+    castImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 5,
+    },
+    castName: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    castCharacter: {
+        fontSize: 12,
+        color: 'gray',
+    },
+    loadingIndicator: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
 });
