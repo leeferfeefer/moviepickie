@@ -19,6 +19,7 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
     const [actorDetails, setActorDetails] = React.useState<ActorDetails | undefined>();
     const [actorCredits, setActorCredits] = React.useState<ActorCredits | undefined>();
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
+    const [loadingMovieImages, setLoadingMovieImages] = React.useState<{ [key: string]: boolean }>({});
 
     React.useEffect(() => {
         navigation.setOptions({
@@ -44,6 +45,14 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
         fetchActorDetails();
         fetchActorCredits();
     }, [actorId]);
+
+    const handleMovieImageLoadStart = (id: string) => {
+        setLoadingMovieImages((prevState) => ({ ...prevState, [id]: true }));
+    };
+
+    const handleMovieImageLoadEnd = (id: string) => {
+        setLoadingMovieImages((prevState) => ({ ...prevState, [id]: false }));
+    };
 
     if (isLoading) {
         return (
@@ -94,13 +103,24 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
             <Text style={styles.label}>Movies:</Text>
             <FlatList
                 data={actorCredits?.cast}
-                keyExtractor={(item, index) => `${index}`}
+                keyExtractor={(_item, index) => `${index}`}
                 renderItem={({ item }) => (
                     <View style={styles.movieItem}>
-                        <Image
-                            source={{ uri: `${IMAGE_URI}${item.poster_path}` }}
-                            style={styles.movieImage}
-                        />
+                        <View style={styles.imageContainer}>
+                                {loadingMovieImages[item.id] && (
+                                    <ActivityIndicator
+                                        style={styles.loadingIndicator}
+                                        size="small"
+                                        color="#0000ff"
+                                    />
+                                )}
+                                <Image
+                                    source={{ uri: `${IMAGE_URI}${item.poster_path}` }}
+                                    style={styles.movieImage}
+                                    onLoadStart={() => handleMovieImageLoadStart(item.id.toString())}
+                                    onLoadEnd={() => handleMovieImageLoadEnd(item.id.toString())}
+                                />
+                            </View>
                         <Text style={styles.movieTitle}>{item.title}</Text>
                         <Text style={styles.movieCharacter}>{item.character}</Text>
                     </View>
@@ -162,6 +182,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 100,
     },
+    imageContainer: {
+        position: 'relative',
+        width: 100,
+        height: 120,
+    },
     movieImage: {
         width: 80,
         height: 120,
@@ -175,5 +200,11 @@ const styles = StyleSheet.create({
     movieCharacter: {
         fontSize: 12,
         color: 'gray',
+    },
+    loadingIndicator: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
 });
