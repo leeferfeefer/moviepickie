@@ -36,7 +36,7 @@ export const UnwatchedScreen = (): React.JSX.Element => {
 
     const showMovieDetails = React.useCallback(async (movie: MovieDetails) => {
         // @ts-ignore
-        navigation.navigate('Detail', { movie, prevRoute: TabScreens.UnwatchedScreen });        
+        navigation.navigate('MovieDetail', { movie, prevRoute: TabScreens.UnwatchedScreen });        
     }, []);
 
     return (

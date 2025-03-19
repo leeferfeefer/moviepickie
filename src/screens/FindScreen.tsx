@@ -37,7 +37,7 @@ export const FindScreen = (): React.JSX.Element => {
         setIsLoading(false);
         if (movieDetails) {
             // @ts-ignore
-            navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
+            navigation.navigate('MovieDetail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
         }
     }, []);
 

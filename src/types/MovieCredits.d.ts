@@ -1,10 +1,10 @@
 type MovieCredits = {
     id: number;
-    cast: Cast[];
-    crew: Cast[];
+    cast: MovieCast[];
+    crew: MovieCast[];
 }
 
-type Cast = {
+type MovieCast = {
     adult: boolean;
     gender: number;
     id: number;

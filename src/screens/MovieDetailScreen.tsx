@@ -1,28 +1,28 @@
 import React from "react";
 import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator, FlatList } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { getMovieTrailerKeys, IMAGE_URI, getMovieCredits } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { TabScreens } from "../components/BottomTabBar";
 
-export type MovieDetailScreenProps = {
-    route: {
-        params: {
-            movie: MovieDetails;
-            prevRoute: string;
-        };
-    };
-};
+type MovieDetailScreenProps = {};
+type MovieDetailScreenRouteProp = RouteProp<{
+    params: {
+        movie: MovieDetails;
+        prevRoute: string;
+    }
+}, 'params'>;
 
-export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Element => {
-    const { route } = props;
-    const { movie, prevRoute } = route.params;
+export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Element => {
     const navigation = useNavigation();
+    const route = useRoute<MovieDetailScreenRouteProp>();
+    const { movie, prevRoute } = route.params;
+
     const [isWatched, setIsWatched] = React.useState(movie.watched);
     const [isLoading, setIsLoading] = React.useState(false);
     const [trailerKeys, setTrailerKeys] = React.useState<string[]>([]);
-    const [actors, setActors] = React.useState<Cast[]>([]);
+    const [actors, setActors] = React.useState<MovieCast[]>([]);
     const [loadingCastImages, setLoadingCastImages] = React.useState<{ [key: string]: boolean }>({});
 
     const addMovie = useMovieStore((state) => state.addMovie);
@@ -87,6 +87,14 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
 
     const handleCastImageLoadEnd = (id: string) => {
         setLoadingCastImages((prevState) => ({ ...prevState, [id]: false }));
+    };
+
+    const navigateToActorDetail = (castMember: MovieCast) => {
+        // @ts-ignore
+        navigation.navigate('ActorDetail', {
+            actorId: castMember.id,
+            actorName: castMember.name,
+        });
     };
 
     return (
@@ -159,25 +167,27 @@ export const MovieDetailScreen = (props: MovieDetailScreenProps): React.JSX.Elem
                 data={actors}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <View style={styles.castItem}>
-                        <View style={styles.imageContainer}>
-                            {loadingCastImages[item.id] && (
-                                <ActivityIndicator
-                                    style={styles.loadingIndicator}
-                                    size="small"
-                                    color="#0000ff"
+                    <TouchableOpacity onPress={() => navigateToActorDetail(item)}>
+                        <View style={styles.castItem}>
+                            <View style={styles.imageContainer}>
+                                {loadingCastImages[item.id] && (
+                                    <ActivityIndicator
+                                        style={styles.loadingIndicator}
+                                        size="small"
+                                        color="#0000ff"
+                                    />
+                                )}
+                                <Image
+                                    source={{ uri: `${IMAGE_URI}${item.profile_path}` }}
+                                    style={styles.castImage}
+                                    onLoadStart={() => handleCastImageLoadStart(item.id.toString())}
+                                    onLoadEnd={() => handleCastImageLoadEnd(item.id.toString())}
                                 />
-                            )}
-                            <Image
-                                source={{ uri: `${IMAGE_URI}${item.profile_path}` }}
-                                style={styles.castImage}
-                                onLoadStart={() => handleCastImageLoadStart(item.id.toString())}
-                                onLoadEnd={() => handleCastImageLoadEnd(item.id.toString())}
-                            />
+                            </View>
+                            <Text style={styles.castName}>{item.name}</Text>
+                            <Text style={styles.castCharacter}>{item.character}</Text>
                         </View>
-                        <Text style={styles.castName}>{item.name}</Text>
-                        <Text style={styles.castCharacter}>{item.character}</Text>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 horizontal
                 showsHorizontalScrollIndicator={false}

@@ -12,7 +12,7 @@ export const RandomMovieHeaderButton = (): React.JSX.Element => {
         if (unwatchedMovies.length > 0) {
             const randomMovie = unwatchedMovies[Math.floor(Math.random() * unwatchedMovies.length)];
             // @ts-ignore
-            navigation.navigate('Detail', { movie: randomMovie, prevRoute: 'Unwatched' });
+            navigation.navigate('MovieDetail', { movie: randomMovie, prevRoute: 'Unwatched' });
         }
     }
 

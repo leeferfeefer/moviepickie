@@ -8,9 +8,6 @@ import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import { getMovieDetails, getNowPlaying, getPopular, getTopRated, getUpcoming } from '../services/TMDB.service';
 import { LoadingIndicator } from '../components/FullScreenLoader';
 
-// const movieCategories = ['Now Playing', 'Popular', 'Top Rated', 'Upcoming'] as const;
-// type MovieCategory = typeof movieCategories[number];
-
 enum MovieCategoryEnum {
     NowPlaying = 'Now Playing',
     Popular = 'Popular',
@@ -129,7 +126,7 @@ export const NewScreen = (): React.JSX.Element => {
         setIsLoading(false);
         if (movieDetails) {
             // @ts-ignore
-            navigation.navigate('Detail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
+            navigation.navigate('MovieDetail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
         }
     }, []);
 

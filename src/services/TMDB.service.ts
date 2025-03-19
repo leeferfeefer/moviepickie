@@ -141,3 +141,33 @@ export const getMovieCredits = async (movieId: MovieResult["id"]): Promise<Movie
     }
     return undefined;
 };
+
+export const getActorDetails = async (actorId: Cast["id"]): Promise<ActorDetails | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/person/${actorId}`, {
+            params: {
+                language: "en-US",
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error getting actor details information: ", error);
+        Alert.alert("Error", "Error getting actor details");
+    }
+    return undefined;
+};
+
+export const getActorCredits = async (actorId: Cast["id"]): Promise<ActorCredits | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/person/${actorId}/movie_credits`, {
+            params: {
+                language: "en-US",
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error getting actor credits information: ", error);
+        Alert.alert("Error", "Error getting actor credits");
+    }
+    return undefined;
+};

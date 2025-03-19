@@ -4,7 +4,7 @@ import { TabBar } from './components/BottomTabBar';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MovieDetailScreen } from './screens/MovieDetailScreen';
 import { createStaticNavigation } from '@react-navigation/native';
-
+import { ActorDetailScreen } from './screens/ActorDetailScreen';
 
 const Stack = createNativeStackNavigator({
     screens: {
@@ -14,7 +14,8 @@ const Stack = createNativeStackNavigator({
                 headerShown: false,
             }
         },
-        Detail: MovieDetailScreen,
+        MovieDetail: MovieDetailScreen,
+        ActorDetail: ActorDetailScreen,
     },
 });
 
