@@ -9,7 +9,7 @@ import { TabScreens } from "../components/BottomTabBar";
 type MovieDetailScreenProps = {};
 type MovieDetailScreenRouteProp = RouteProp<{
     params: {
-        movie: MovieDetails;
+        movieId: number;
         prevRoute: string;
     }
 }, 'params'>;
@@ -17,7 +17,7 @@ type MovieDetailScreenRouteProp = RouteProp<{
 export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Element => {
     const navigation = useNavigation();
     const route = useRoute<MovieDetailScreenRouteProp>();
-    const { movie, prevRoute } = route.params;
+    const { movieId, prevRoute } = route.params;
 
     const [isWatched, setIsWatched] = React.useState(movie.watched);
     const [isLoading, setIsLoading] = React.useState(false);

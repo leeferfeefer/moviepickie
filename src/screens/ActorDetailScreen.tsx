@@ -28,23 +28,31 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
     }, []);
 
     React.useEffect(() => {
-        const fetchActorDetails = async () => {
-            setIsLoading(true);
-            const details = await getActorDetails(actorId);
+        let isSubscribed = true;
+        getDetails(isSubscribed);
+        getCredits(isSubscribed);
+        return () => {
+            isSubscribed = false;
+        }
+    }, [actorId]);
+
+    const getDetails = async (isSubscribed: boolean) => {
+        setIsLoading(true);
+        const details = await getActorDetails(actorId);
+        if (isSubscribed) {
             setActorDetails(details);
             setIsLoading(false);
-        };
+        }
+    };
 
-        const fetchActorCredits = async () => {
-            setIsLoading(true);
-            const credits = await getActorCredits(actorId);
+    const getCredits = async (isSubscribed: boolean) => {
+        setIsLoading(true);
+        const credits = await getActorCredits(actorId);
+        if (isSubscribed) {
             setActorCredits(credits);
             setIsLoading(false);
-        };
-
-        fetchActorDetails();
-        fetchActorCredits();
-    }, [actorId]);
+        }
+    };
 
     const handleMovieImageLoadStart = (id: string) => {
         setLoadingMovieImages((prevState) => ({ ...prevState, [id]: true }));
@@ -117,8 +125,8 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
                                 <Image
                                     source={{ uri: `${IMAGE_URI}${item.poster_path}` }}
                                     style={styles.movieImage}
-                                    onLoadStart={() => handleMovieImageLoadStart(item.id.toString())}
-                                    onLoadEnd={() => handleMovieImageLoadEnd(item.id.toString())}
+                                    onLoadStart={React.useCallback(() => handleMovieImageLoadStart(item.id.toString()), [])}
+                                    onLoadEnd={React.useCallback(() => handleMovieImageLoadEnd(item.id.toString()), [])}
                                 />
                             </View>
                         <Text style={styles.movieTitle}>{item.title}</Text>

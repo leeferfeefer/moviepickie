@@ -32,13 +32,8 @@ export const FindScreen = (): React.JSX.Element => {
     }, []);
 
     const showMovieDetails = React.useCallback(async (movieId: MovieResult["id"]) => {
-        setIsLoading(true);
-        const movieDetails = await getMovieDetails(movieId);
-        setIsLoading(false);
-        if (movieDetails) {
-            // @ts-ignore
-            navigation.navigate('MovieDetail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
-        }
+        // @ts-ignore
+        navigation.navigate('MovieDetail', { movieId, prevRoute: TabScreens.FindNewMovie });
     }, []);
 
     const loadMoreData = React.useCallback(() => {
