@@ -1,20 +1,38 @@
 import React from "react";
-import { Text, StyleSheet, ScrollView, Image, TouchableOpacity, View, ActivityIndicator, FlatList } from "react-native";
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { getMovieTrailerKeys, IMAGE_URI, getMovieCredits } from "../services/TMDB.service";
+import {
+    Text,
+    StyleSheet,
+    ScrollView,
+    Image,
+    TouchableOpacity,
+    View,
+    ActivityIndicator,
+    FlatList,
+} from "react-native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+    getMovieTrailerKeys,
+    IMAGE_URI,
+    getMovieCredits,
+} from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { TabScreens } from "../components/BottomTabBar";
 
-type MovieDetailScreenProps = {};
-type MovieDetailScreenRouteProp = RouteProp<{
-    params: {
-        movieId: number;
-        prevRoute: string;
-    }
-}, 'params'>;
+type MovieDetailScreenProps = object;
+type MovieDetailScreenRouteProp = RouteProp<
+    {
+        params: {
+            movieId: number;
+            prevRoute: string;
+        };
+    },
+    "params"
+>;
 
-export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Element => {
+export const MovieDetailScreen = (
+    _props: MovieDetailScreenProps,
+): React.JSX.Element => {
     const navigation = useNavigation();
     const route = useRoute<MovieDetailScreenRouteProp>();
     const { movieId, prevRoute } = route.params;
@@ -23,13 +41,15 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
     const [isLoading, setIsLoading] = React.useState(false);
     const [trailerKeys, setTrailerKeys] = React.useState<string[]>([]);
     const [actors, setActors] = React.useState<MovieCast[]>([]);
-    const [loadingCastImages, setLoadingCastImages] = React.useState<{ [key: string]: boolean }>({});
+    const [loadingCastImages, setLoadingCastImages] = React.useState<{
+        [key: string]: boolean;
+    }>({});
 
-    const addMovie = useMovieStore((state) => state.addMovie);
-    const removeMovie = useMovieStore((state) => state.removeMovie);
-    const toggleWatch = useMovieStore((state) => state.toggleWatch);
-    const movies = useMovieStore((state) => state.movies);
-    const isAdded = movies.some((m) => m.id === movie.id);
+    const addMovie = useMovieStore(state => state.addMovie);
+    const removeMovie = useMovieStore(state => state.removeMovie);
+    const toggleWatch = useMovieStore(state => state.toggleWatch);
+    const movies = useMovieStore(state => state.movies);
+    const isAdded = movies.some(m => m.id === movie.id);
 
     React.useEffect(() => {
         let isSubscribed = true;
@@ -45,6 +65,7 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
         return () => {
             isSubscribed = false;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const getTrailers = async (isSubscribed: boolean) => {
@@ -63,7 +84,7 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
             setActors(credits.cast);
             setIsLoading(false);
         }
-    }
+    };
 
     const toggleAdded = React.useCallback(() => {
         if (isAdded) {
@@ -71,6 +92,7 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
         } else {
             addMovie(movie);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdded]);
 
     const toggleWatched = React.useCallback(() => {
@@ -79,19 +101,21 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
         }
         toggleWatch(movie.id);
         setIsWatched(!isWatched);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isWatched]);
 
     const handleCastImageLoadStart = (id: string) => {
-        setLoadingCastImages((prevState) => ({ ...prevState, [id]: true }));
+        setLoadingCastImages(prevState => ({ ...prevState, [id]: true }));
     };
 
     const handleCastImageLoadEnd = (id: string) => {
-        setLoadingCastImages((prevState) => ({ ...prevState, [id]: false }));
+        setLoadingCastImages(prevState => ({ ...prevState, [id]: false }));
     };
 
     const navigateToActorDetail = (castMember: MovieCast) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        navigation.navigate('ActorDetail', {
+        navigation.navigate("ActorDetail", {
             actorId: castMember.id,
             actorName: castMember.name,
         });
@@ -104,17 +128,15 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
                 style={styles.poster}
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={toggleAdded}
-                >
-                    <Text style={styles.buttonText}>{isAdded ? "Remove Movie" : "Add Movie"}</Text>
+                <TouchableOpacity style={styles.button} onPress={toggleAdded}>
+                    <Text style={styles.buttonText}>
+                        {isAdded ? "Remove Movie" : "Add Movie"}
+                    </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={toggleWatched}
-                >
-                    <Text style={styles.buttonText}>{isWatched ? "Unwatch" : "Watch"}</Text>
+                <TouchableOpacity style={styles.button} onPress={toggleWatched}>
+                    <Text style={styles.buttonText}>
+                        {isWatched ? "Unwatch" : "Watch"}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
@@ -122,13 +144,17 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
             <Text style={styles.tagline}>{movie.tagline}</Text>
             <Text style={styles.overview}>{movie.overview}</Text>
             <Text style={styles.label}>Genres:</Text>
-            <Text>{movie.genres.map(genre => genre.name).join(', ')}</Text>
+            <Text>{movie.genres.map(genre => genre.name).join(", ")}</Text>
             <Text style={styles.label}>Release Date:</Text>
             <Text>{new Date(movie.release_date).toLocaleDateString()}</Text>
             <Text style={styles.label}>Runtime:</Text>
             <Text>{movie.runtime} minutes</Text>
             <Text style={styles.label}>Production Companies:</Text>
-            <Text>{movie.production_companies.map(company => company.name).join(', ')}</Text>
+            <Text>
+                {movie.production_companies
+                    .map(company => company.name)
+                    .join(", ")}
+            </Text>
             <Text style={styles.label}>Vote Average:</Text>
             <Text>{movie.vote_average}</Text>
             <Text style={styles.label}>Vote Count:</Text>
@@ -138,15 +164,14 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
                 <>
                     <Text style={styles.label}>Trailers:</Text>
                     <View style={styles.trailerContainer}>
-                        <ActivityIndicator
-                            animating={isLoading}
-                            size="small"
-                        />
+                        <ActivityIndicator animating={isLoading} size="small" />
                         {trailerKeys.length === 0 && !isLoading && (
                             <Text>No trailers available</Text>
                         )}
                         {trailerKeys.length > 0 && !isLoading && (
-                            <ScrollView horizontal style={styles.videoContainer}>
+                            <ScrollView
+                                horizontal
+                                style={styles.videoContainer}>
                                 {trailerKeys.map((key, index) => (
                                     <View key={index} style={styles.trailer}>
                                         <YoutubePlayer
@@ -165,9 +190,10 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
             <Text style={styles.label}>Cast:</Text>
             <FlatList
                 data={actors}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigateToActorDetail(item)}>
+                    <TouchableOpacity
+                        onPress={() => navigateToActorDetail(item)}>
                         <View style={styles.castItem}>
                             <View style={styles.imageContainer}>
                                 {loadingCastImages[item.id] && (
@@ -178,14 +204,26 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
                                     />
                                 )}
                                 <Image
-                                    source={{ uri: `${IMAGE_URI}${item.profile_path}` }}
+                                    source={{
+                                        uri: `${IMAGE_URI}${item.profile_path}`,
+                                    }}
                                     style={styles.castImage}
-                                    onLoadStart={() => handleCastImageLoadStart(item.id.toString())}
-                                    onLoadEnd={() => handleCastImageLoadEnd(item.id.toString())}
+                                    onLoadStart={() =>
+                                        handleCastImageLoadStart(
+                                            item.id.toString(),
+                                        )
+                                    }
+                                    onLoadEnd={() =>
+                                        handleCastImageLoadEnd(
+                                            item.id.toString(),
+                                        )
+                                    }
                                 />
                             </View>
                             <Text style={styles.castName}>{item.name}</Text>
-                            <Text style={styles.castCharacter}>{item.character}</Text>
+                            <Text style={styles.castCharacter}>
+                                {item.character}
+                            </Text>
                         </View>
                     </TouchableOpacity>
                 )}
@@ -195,105 +233,104 @@ export const MovieDetailScreen = (_props: MovieDetailScreenProps): React.JSX.Ele
             />
         </ScrollView>
     );
-}
+};
 
 const styles = StyleSheet.create({
+    button: {
+        alignContent: "center",
+        alignItems: "center",
+        borderRadius: 5,
+        borderWidth: 1,
+        flex: 1,
+        marginHorizontal: 10,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: 20,
+    },
+    buttonText: {
+        fontSize: 20,
+        padding: 10,
+        textAlign: "center",
+    },
+    castCharacter: {
+        color: "gray",
+        fontSize: 12,
+    },
+    castImage: {
+        borderRadius: 40,
+        height: 80,
+        marginBottom: 5,
+        width: 80,
+    },
+    castItem: {
+        alignItems: "center",
+        marginRight: 10,
+        width: 100,
+    },
+    castList: {
+        marginBottom: 50,
+        marginTop: 20,
+    },
+    castName: {
+        fontSize: 14,
+        fontWeight: "bold",
+    },
     container: {
+        backgroundColor: "white",
         flex: 1,
         padding: 10,
-        backgroundColor: 'white',
     },
-    poster: {
-        height: 700,
-        resizeMode: 'cover',
-        marginBottom: 10,
+    imageContainer: {
+        height: 80,
+        position: "relative",
+        width: 80,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    tagline: {
+    label: {
         fontSize: 16,
-        fontStyle: 'italic',
-        marginBottom: 10,
+        fontWeight: "bold",
+        marginTop: 10,
+    },
+    loadingIndicator: {
+        left: "50%",
+        position: "absolute",
+        top: "50%",
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
     overview: {
         fontSize: 14,
         marginBottom: 10,
     },
-    label: {
+    poster: {
+        height: 700,
+        marginBottom: 10,
+        resizeMode: "cover",
+    },
+    tagline: {
         fontSize: 16,
-        fontWeight: 'bold',
-        marginTop: 10,
+        fontStyle: "italic",
+        marginBottom: 10,
     },
-    voteCount: {
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: "space-between",
-        marginVertical: 20,
-    },
-    button: {
-        flex: 1,
-        borderRadius: 5,
-        borderWidth: 1,
-        alignContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 10,
-    },
-    buttonText: {
-        textAlign: 'center',
-        fontSize: 20,
-        padding: 10,
-    },
-    trailerContainer: {
-        marginTop: 20,
-        alignContent: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    trailer: {
-        width: 300,
-        height: 200,
-        marginRight: 10,
-    },
-    videoContainer: {
-        flexDirection: 'row',
-        marginBottom: 20,
-    },
-    castList: {
-        marginTop: 20,
-        marginBottom: 50,
-    },
-    castItem: {
-        marginRight: 10,
-        alignItems: 'center',
-        width: 100,
-    },
-    imageContainer: {
-        position: 'relative',
-        width: 80,
-        height: 80,
-    },
-    castImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
         marginBottom: 5,
     },
-    castName: {
-        fontSize: 14,
-        fontWeight: 'bold',
+    trailer: {
+        height: 200,
+        marginRight: 10,
+        width: 300,
     },
-    castCharacter: {
-        fontSize: 12,
-        color: 'gray',
+    trailerContainer: {
+        alignContent: "center",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 20,
     },
-    loadingIndicator: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: [{ translateX: -12 }, { translateY: -12 }],
+    videoContainer: {
+        flexDirection: "row",
+        marginBottom: 20,
     },
+    voteCount: {},
 });

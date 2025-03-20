@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports, prettier/prettier
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 /**

@@ -1,6 +1,6 @@
 import Config from "react-native-config";
 import axios from "axios";
-import { Alert } from 'react-native';
+import { Alert } from "react-native";
 
 // axios.interceptors.request.use(request => {
 //   console.log('Starting Request', JSON.stringify(request));
@@ -19,17 +19,20 @@ const tmdbInstance = axios.create({
     timeout: 5000,
     params: {
         api_key: Config.TMDB_API_KEY,
-    }
+    },
 });
 
-export const searchMovies = async (movieName: MovieResult["title"], page: number = 1): Promise<MovieResults | undefined> => {
+export const searchMovies = async (
+    movieName: MovieResult["title"],
+    page: number = 1,
+): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get("/search/movie", {
             params: {
                 language: "en-US",
                 query: movieName,
-                page
-            }
+                page,
+            },
         });
         return response.data;
     } catch (error) {
@@ -39,7 +42,9 @@ export const searchMovies = async (movieName: MovieResult["title"], page: number
     return undefined;
 };
 
-export const getMovieDetails = async (movieId: MovieResult["id"]): Promise<MovieDetails | undefined> => {
+export const getMovieDetails = async (
+    movieId: MovieResult["id"],
+): Promise<MovieDetails | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/${movieId}`);
         return response.data;
@@ -50,26 +55,35 @@ export const getMovieDetails = async (movieId: MovieResult["id"]): Promise<Movie
     return undefined;
 };
 
-export const getMovieTrailerKeys = async (movieId: MovieResult["id"]): Promise<string[] | undefined> => {
+export const getMovieTrailerKeys = async (
+    movieId: MovieResult["id"],
+): Promise<string[] | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/${movieId}/videos`);
         const data = response.data;
-        const trailers: MovieTrailerResult[] = data.results.filter((result: MovieTrailerResult) => result.type === "Trailer" && result.official && result.site === "YouTube");
+        const trailers: MovieTrailerResult[] = data.results.filter(
+            (result: MovieTrailerResult) =>
+                result.type === "Trailer" &&
+                result.official &&
+                result.site === "YouTube",
+        );
         return trailers.map(trailer => trailer.key);
     } catch (error) {
         console.log("Error getting movie trailer information: ", error);
         Alert.alert("Error", "Error getting movie trailers");
     }
     return undefined;
-}
+};
 
-export const getNowPlaying = async (page: number): Promise<MovieResults | undefined> => {
+export const getNowPlaying = async (
+    page: number,
+): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/now_playing`, {
             params: {
                 language: "en-US",
-                page
-            }
+                page,
+            },
         });
         return response.data;
     } catch (error) {
@@ -79,13 +93,15 @@ export const getNowPlaying = async (page: number): Promise<MovieResults | undefi
     return undefined;
 };
 
-export const getPopular = async (page: number): Promise<MovieResults | undefined> => {
+export const getPopular = async (
+    page: number,
+): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/popular`, {
             params: {
                 language: "en-US",
-                page
-            }
+                page,
+            },
         });
         return response.data;
     } catch (error) {
@@ -95,13 +111,15 @@ export const getPopular = async (page: number): Promise<MovieResults | undefined
     return undefined;
 };
 
-export const getTopRated = async (page: number): Promise<MovieResults | undefined> => {
+export const getTopRated = async (
+    page: number,
+): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/top_rated`, {
             params: {
                 language: "en-US",
-                page
-            }
+                page,
+            },
         });
         return response.data;
     } catch (error) {
@@ -111,13 +129,15 @@ export const getTopRated = async (page: number): Promise<MovieResults | undefine
     return undefined;
 };
 
-export const getUpcoming = async (page: number): Promise<MovieResults | undefined> => {
+export const getUpcoming = async (
+    page: number,
+): Promise<MovieResults | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/upcoming`, {
             params: {
                 language: "en-US",
-                page
-            }
+                page,
+            },
         });
         return response.data;
     } catch (error) {
@@ -127,12 +147,14 @@ export const getUpcoming = async (page: number): Promise<MovieResults | undefine
     return undefined;
 };
 
-export const getMovieCredits = async (movieId: MovieResult["id"]): Promise<MovieCredits | undefined> => {
+export const getMovieCredits = async (
+    movieId: MovieResult["id"],
+): Promise<MovieCredits | undefined> => {
     try {
         const response = await tmdbInstance.get(`/movie/${movieId}/credits`, {
             params: {
                 language: "en-US",
-            }
+            },
         });
         return response.data;
     } catch (error) {
@@ -142,12 +164,14 @@ export const getMovieCredits = async (movieId: MovieResult["id"]): Promise<Movie
     return undefined;
 };
 
-export const getActorDetails = async (actorId: Cast["id"]): Promise<ActorDetails | undefined> => {
+export const getActorDetails = async (
+    actorId: ActorCast["id"],
+): Promise<ActorDetails | undefined> => {
     try {
         const response = await tmdbInstance.get(`/person/${actorId}`, {
             params: {
                 language: "en-US",
-            }
+            },
         });
         return response.data;
     } catch (error) {
@@ -157,13 +181,18 @@ export const getActorDetails = async (actorId: Cast["id"]): Promise<ActorDetails
     return undefined;
 };
 
-export const getActorCredits = async (actorId: Cast["id"]): Promise<ActorCredits | undefined> => {
+export const getActorCredits = async (
+    actorId: ActorCast["id"],
+): Promise<ActorCredits | undefined> => {
     try {
-        const response = await tmdbInstance.get(`/person/${actorId}/movie_credits`, {
-            params: {
-                language: "en-US",
-            }
-        });
+        const response = await tmdbInstance.get(
+            `/person/${actorId}/movie_credits`,
+            {
+                params: {
+                    language: "en-US",
+                },
+            },
+        );
         return response.data;
     } catch (error) {
         console.log("Error getting actor credits information: ", error);

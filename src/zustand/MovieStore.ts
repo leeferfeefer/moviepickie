@@ -1,6 +1,6 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { zustandStorage } from '../services/MMKV.service';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { zustandStorage } from "../services/MMKV.service";
 
 type MovieStore = {
     movies: MovieDetails[];
@@ -13,10 +13,12 @@ export const useMovieStore = create<MovieStore>()(
     persist(
         (set, get) => ({
             movies: [],
-            addMovie: (movie: MovieDetails) => set({ movies: [...get().movies, movie] }),
-            removeMovie: (id: number) => set({ movies: get().movies.filter((movie) => movie.id !== id) }),
+            addMovie: (movie: MovieDetails) =>
+                set({ movies: [...get().movies, movie] }),
+            removeMovie: (id: number) =>
+                set({ movies: get().movies.filter(movie => movie.id !== id) }),
             toggleWatch: (id: number) => {
-                const movies = get().movies.map((movie) => {
+                const movies = get().movies.map(movie => {
                     if (movie.id === id) {
                         return { ...movie, watched: !movie.watched };
                     }
@@ -26,8 +28,8 @@ export const useMovieStore = create<MovieStore>()(
             },
         }),
         {
-            name: 'movie-store',
+            name: "movie-store",
             storage: createJSONStorage(() => zustandStorage),
-        }
-    )
+        },
+    ),
 );

@@ -13,4 +13,4 @@ type ActorDetails = {
     place_of_birth: string;
     popularity: number;
     profile_path: string;
-}
+};

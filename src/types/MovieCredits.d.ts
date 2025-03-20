@@ -2,7 +2,7 @@ type MovieCredits = {
     id: number;
     cast: MovieCast[];
     crew: MovieCast[];
-}
+};
 
 type MovieCast = {
     adult: boolean;
@@ -19,7 +19,7 @@ type MovieCast = {
     order?: number;
     department?: Department;
     job?: string;
-}
+};
 
 enum Department {
     Acting = "Acting",

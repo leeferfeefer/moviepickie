@@ -1,30 +1,54 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, FlatList } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { getActorCredits, getActorDetails, IMAGE_URI } from '../services/TMDB.service';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    ScrollView,
+    ActivityIndicator,
+    FlatList,
+} from "react-native";
+import { useRoute, RouteProp } from "@react-navigation/native";
+import {
+    getActorCredits,
+    getActorDetails,
+    IMAGE_URI,
+} from "../services/TMDB.service";
+import { useNavigation } from "@react-navigation/native";
 
-type ActorDetailScreenRouteProp = RouteProp<{
-    params: {
-        actorId: number,
-        actorName: string,
-    }
-}, 'params'>;
-type ActorDetailScreenProps = {};
+type ActorDetailScreenRouteProp = RouteProp<
+    {
+        params: {
+            actorId: number;
+            actorName: string;
+        };
+    },
+    "params"
+>;
+type ActorDetailScreenProps = object;
 
-export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Element => {
+export const ActorDetailScreen = (
+    _props: ActorDetailScreenProps,
+): React.JSX.Element => {
     const navigation = useNavigation();
     const route = useRoute<ActorDetailScreenRouteProp>();
     const { actorId, actorName } = route.params;
-    const [actorDetails, setActorDetails] = React.useState<ActorDetails | undefined>();
-    const [actorCredits, setActorCredits] = React.useState<ActorCredits | undefined>();
+    const [actorDetails, setActorDetails] = React.useState<
+        ActorDetails | undefined
+    >();
+    const [actorCredits, setActorCredits] = React.useState<
+        ActorCredits | undefined
+    >();
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
-    const [loadingMovieImages, setLoadingMovieImages] = React.useState<{ [key: string]: boolean }>({});
+    const [loadingMovieImages, setLoadingMovieImages] = React.useState<{
+        [key: string]: boolean;
+    }>({});
 
     React.useEffect(() => {
         navigation.setOptions({
             headerTitle: actorName,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     React.useEffect(() => {
@@ -33,7 +57,8 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
         getCredits(isSubscribed);
         return () => {
             isSubscribed = false;
-        }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [actorId]);
 
     const getDetails = async (isSubscribed: boolean) => {
@@ -55,11 +80,11 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
     };
 
     const handleMovieImageLoadStart = (id: string) => {
-        setLoadingMovieImages((prevState) => ({ ...prevState, [id]: true }));
+        setLoadingMovieImages(prevState => ({ ...prevState, [id]: true }));
     };
 
     const handleMovieImageLoadEnd = (id: string) => {
-        setLoadingMovieImages((prevState) => ({ ...prevState, [id]: false }));
+        setLoadingMovieImages(prevState => ({ ...prevState, [id]: false }));
     };
 
     if (isLoading) {
@@ -73,7 +98,9 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
     if (!actorDetails) {
         return (
             <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Failed to load actor details.</Text>
+                <Text style={styles.errorText}>
+                    Failed to load actor details.
+                </Text>
             </View>
         );
     }
@@ -106,7 +133,7 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
             <Text style={styles.label}>Known For:</Text>
             <Text>{actorDetails.known_for_department}</Text>
             <Text style={styles.label}>Also Known As:</Text>
-            <Text>{actorDetails.also_known_as.join(', ')}</Text>
+            <Text>{actorDetails.also_known_as.join(", ")}</Text>
 
             <Text style={styles.label}>Movies:</Text>
             <FlatList
@@ -115,22 +142,32 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
                 renderItem={({ item }) => (
                     <View style={styles.movieItem}>
                         <View style={styles.imageContainer}>
-                                {loadingMovieImages[item.id] && (
-                                    <ActivityIndicator
-                                        style={styles.loadingIndicator}
-                                        size="small"
-                                        color="#0000ff"
-                                    />
-                                )}
-                                <Image
-                                    source={{ uri: `${IMAGE_URI}${item.poster_path}` }}
-                                    style={styles.movieImage}
-                                    onLoadStart={React.useCallback(() => handleMovieImageLoadStart(item.id.toString()), [])}
-                                    onLoadEnd={React.useCallback(() => handleMovieImageLoadEnd(item.id.toString()), [])}
+                            {loadingMovieImages[item.id] && (
+                                <ActivityIndicator
+                                    style={styles.loadingIndicator}
+                                    size="small"
+                                    color="#0000ff"
                                 />
-                            </View>
+                            )}
+                            <Image
+                                source={{
+                                    uri: `${IMAGE_URI}${item.poster_path}`,
+                                }}
+                                style={styles.movieImage}
+                                onLoadStart={() =>
+                                    handleMovieImageLoadStart(
+                                        item.id.toString(),
+                                    )
+                                }
+                                onLoadEnd={() =>
+                                    handleMovieImageLoadEnd(item.id.toString())
+                                }
+                            />
+                        </View>
                         <Text style={styles.movieTitle}>{item.title}</Text>
-                        <Text style={styles.movieCharacter}>{item.character}</Text>
+                        <Text style={styles.movieCharacter}>
+                            {item.character}
+                        </Text>
                     </View>
                 )}
                 horizontal
@@ -142,77 +179,77 @@ export const ActorDetailScreen = (_props: ActorDetailScreenProps): React.JSX.Ele
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-        backgroundColor: 'white',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
-    },
-    profileImage: {
-        width: '100%',
-        height: 400,
-        resizeMode: 'cover',
-        marginBottom: 10,
-    },
-    name: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginTop: 10,
-    },
     biography: {
         fontSize: 14,
         marginBottom: 10,
     },
-    movieList: {
-        marginTop: 20,
-        marginBottom: 50,
+    container: {
+        backgroundColor: "white",
+        flex: 1,
+        padding: 10,
     },
-    movieItem: {
-        marginRight: 10,
-        alignItems: 'center',
-        width: 100,
+    errorContainer: {
+        alignItems: "center",
+        flex: 1,
+        justifyContent: "center",
+    },
+    errorText: {
+        color: "red",
+        fontSize: 18,
     },
     imageContainer: {
-        position: 'relative',
-        width: 100,
         height: 120,
+        position: "relative",
+        width: 100,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: "bold",
+        marginTop: 10,
+    },
+    loadingContainer: {
+        alignItems: "center",
+        flex: 1,
+        justifyContent: "center",
+    },
+    loadingIndicator: {
+        left: "50%",
+        position: "absolute",
+        top: "50%",
+        transform: [{ translateX: -12 }, { translateY: -12 }],
+    },
+    movieCharacter: {
+        color: "gray",
+        fontSize: 12,
     },
     movieImage: {
-        width: 80,
-        height: 120,
         borderRadius: 5,
+        height: 120,
         marginBottom: 5,
+        width: 80,
+    },
+    movieItem: {
+        alignItems: "center",
+        marginRight: 10,
+        width: 100,
+    },
+    movieList: {
+        marginBottom: 50,
+        marginTop: 20,
     },
     movieTitle: {
         fontSize: 14,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
-    movieCharacter: {
-        fontSize: 12,
-        color: 'gray',
+    name: {
+        fontSize: 24,
+        fontWeight: "bold",
+        marginBottom: 10,
     },
-    loadingIndicator: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: [{ translateX: -12 }, { translateY: -12 }],
+    profileImage: {
+        height: 400,
+        marginBottom: 10,
+        resizeMode: "cover",
+        width: "100%",
     },
 });

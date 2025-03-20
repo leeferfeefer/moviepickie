@@ -1,10 +1,9 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { TabBar } from './components/BottomTabBar';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { MovieDetailScreen } from './screens/MovieDetailScreen';
-import { createStaticNavigation } from '@react-navigation/native';
-import { ActorDetailScreen } from './screens/ActorDetailScreen';
+import React from "react";
+import { TabBar } from "./components/BottomTabBar";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { MovieDetailScreen } from "./screens/MovieDetailScreen";
+import { createStaticNavigation } from "@react-navigation/native";
+import { ActorDetailScreen } from "./screens/ActorDetailScreen";
 
 const Stack = createNativeStackNavigator({
     screens: {
@@ -12,7 +11,7 @@ const Stack = createNativeStackNavigator({
             screen: TabBar,
             options: {
                 headerShown: false,
-            }
+            },
         },
         MovieDetail: MovieDetailScreen,
         ActorDetail: ActorDetailScreen,
@@ -22,10 +21,8 @@ const Stack = createNativeStackNavigator({
 export const Navigation = createStaticNavigation(Stack);
 
 const App = (): React.JSX.Element => {
-    return (
-        <Navigation/>
-    );
-}
+    return <Navigation />;
+};
 
 // <SafeAreaView style={backgroundStyle}>
 //     <StatusBar
@@ -33,7 +30,5 @@ const App = (): React.JSX.Element => {
 //         backgroundColor={backgroundStyle.backgroundColor}
 //     />
 // </SafeAreaView>
-
-const styles = StyleSheet.create({});
 
 export default App;

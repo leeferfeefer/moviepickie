@@ -8,38 +8,41 @@ export type SearchBarProps = {
 };
 
 export const SearchBar = (props: SearchBarProps): React.JSX.Element => {
-    const { placeholder, onEnterPress } = props;
+    const { placeholder, onEnterPress, onChangeText } = props;
     const [search, setSearch] = React.useState<string>("");
 
-    const onChangeText = React.useCallback((text: string) => {
-        setSearch(text);
-        props.onChangeText?.(text);
-    }, [search]);
+    const onTextChange = React.useCallback(
+        (text: string) => {
+            setSearch(text);
+            onChangeText?.(text);
+        },
+        [onChangeText],
+    );
 
     const onSubmitEditing = React.useCallback(() => {
         if (onEnterPress && search) {
             onEnterPress(search);
         }
-    }, [search]);
+    }, [onEnterPress, search]);
 
     return (
         <TextInput
             style={styles.searchBar}
             placeholder={placeholder}
-            onChangeText={onChangeText}
+            onChangeText={onTextChange}
             onSubmitEditing={onSubmitEditing}
             value={search}
         />
     );
-}
+};
 
 const styles = StyleSheet.create({
     searchBar: {
-        borderColor: 'gray',
+        backgroundColor: "white",
+        borderColor: "gray",
         borderWidth: 1,
-        paddingLeft: 10,
-        width: '100%',
-        backgroundColor: 'white',
         fontSize: 25,
+        paddingLeft: 10,
+        width: "100%",
     },
 });

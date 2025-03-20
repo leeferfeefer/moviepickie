@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { FlatList, StyleSheet, View, Text, RefreshControl } from "react-native";
 
 type MovieListProps<T> = {
@@ -8,7 +8,9 @@ type MovieListProps<T> = {
     onRefresh?: () => Promise<void>;
 };
 
-export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Element => {
+export const MovieList = <T extends object>(
+    props: MovieListProps<T>,
+): React.JSX.Element => {
     const { data, renderItem, loadMoreData, onRefresh } = props;
     const [refreshing, setRefreshing] = React.useState(false);
 
@@ -20,14 +22,13 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
         }
     }, [onRefresh]);
 
-    const refreshControl = (
-        onRefresh ? 
+    const refreshControl = onRefresh ? (
         <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
             tintColor="gray"
-        /> : undefined
-    );
+        />
+    ) : undefined;
 
     return (
         <>
@@ -51,12 +52,12 @@ export const MovieList = <T extends {}>(props: MovieListProps<T>): React.JSX.Ele
 
 const styles = StyleSheet.create({
     emptyContainer: {
+        alignItems: "center",
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        justifyContent: "center",
     },
     emptyText: {
+        color: "gray",
         fontSize: 40,
-        color: 'gray',
-    }
+    },
 });

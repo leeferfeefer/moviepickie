@@ -1,18 +1,23 @@
-import React from 'react';
-import { StyleSheet, RefreshControl } from "react-native";
-import { MovieList } from '../components/MovieList';
-import { MovieListItem } from '../components/MovieListItem';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { MovieList } from "../components/MovieList";
+import { MovieListItem } from "../components/MovieListItem";
+import { useNavigation } from "@react-navigation/native";
 import { TabScreens } from "../components/BottomTabBar";
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { getMovieDetails, getNowPlaying, getPopular, getTopRated, getUpcoming } from '../services/TMDB.service';
-import { LoadingIndicator } from '../components/FullScreenLoader';
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import {
+    getMovieDetails,
+    getNowPlaying,
+    getPopular,
+    getTopRated,
+    getUpcoming,
+} from "../services/TMDB.service";
+import { LoadingIndicator } from "../components/FullScreenLoader";
 
 enum MovieCategoryEnum {
-    NowPlaying = 'Now Playing',
-    Popular = 'Popular',
-    TopRated = 'Top Rated',
-    Upcoming = 'Upcoming',
+    NowPlaying = "Now Playing",
+    Popular = "Popular",
+    TopRated = "Top Rated",
+    Upcoming = "Upcoming",
 }
 
 const movieCategoryNames = Object.values(MovieCategoryEnum);
@@ -33,7 +38,8 @@ type RetrieveMovieResultsMap = Record<
     keyof MovieCategories,
     {
         retrieveResults: (page: number) => Promise<MovieResults | undefined>;
-    }>;
+    }
+>;
 const retrieveMovieResultsMap: RetrieveMovieResultsMap = {
     [MovieCategoryEnum.NowPlaying]: {
         retrieveResults: getNowPlaying,
@@ -47,28 +53,29 @@ const retrieveMovieResultsMap: RetrieveMovieResultsMap = {
     [MovieCategoryEnum.Upcoming]: {
         retrieveResults: getUpcoming,
     },
-}
+};
 
 export const NewScreen = (): React.JSX.Element => {
     const navigation = useNavigation();
-    const [movieCategories, setMovieCategories] = React.useState<MovieCategories>({
-        [MovieCategoryEnum.NowPlaying]: {
-            movieResults: [],
-            currentPage: 0,
-        },
-        [MovieCategoryEnum.Popular]: {
-            movieResults: [],
-            currentPage: 0,
-        },
-        [MovieCategoryEnum.TopRated]: {
-            movieResults: [],
-            currentPage: 0,
-        },
-        [MovieCategoryEnum.Upcoming]: {
-            movieResults: [],
-            currentPage: 0,
-        },
-    });
+    const [movieCategories, setMovieCategories] =
+        React.useState<MovieCategories>({
+            [MovieCategoryEnum.NowPlaying]: {
+                movieResults: [],
+                currentPage: 0,
+            },
+            [MovieCategoryEnum.Popular]: {
+                movieResults: [],
+                currentPage: 0,
+            },
+            [MovieCategoryEnum.TopRated]: {
+                movieResults: [],
+                currentPage: 0,
+            },
+            [MovieCategoryEnum.Upcoming]: {
+                movieResults: [],
+                currentPage: 0,
+            },
+        });
 
     const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -92,12 +99,23 @@ export const NewScreen = (): React.JSX.Element => {
         return () => {
             isSubscribed = false;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedIndex]);
 
-    const fetchMovieResults = async (selectedMovieCategoryName: MovieCategoryEnum, isSubscribed: boolean, page: number, onRefresh?: boolean) => {        
+    const fetchMovieResults = async (
+        selectedMovieCategoryName: MovieCategoryEnum,
+        isSubscribed: boolean,
+        page: number,
+        onRefresh?: boolean,
+    ) => {
         setIsLoading(true);
-        const newMovieResults = await retrieveMovieResultsMap[selectedMovieCategoryName].retrieveResults(page);
-        const movieResultsToMerge = onRefresh ? [] : selectedMovieCategory.movieResults;
+        const newMovieResults =
+            await retrieveMovieResultsMap[
+                selectedMovieCategoryName
+            ].retrieveResults(page);
+        const movieResultsToMerge = onRefresh
+            ? []
+            : selectedMovieCategory.movieResults;
 
         if (isSubscribed) {
             if (newMovieResults) {
@@ -120,18 +138,31 @@ export const NewScreen = (): React.JSX.Element => {
         setSelectedIndex(index);
     };
 
-    const showMovieDetails = React.useCallback(async (movieId: MovieResult["id"]) => {
-        setIsLoading(true);
-        const movieDetails = await getMovieDetails(movieId);
-        setIsLoading(false);
-        if (movieDetails) {
-            // @ts-ignore
-            navigation.navigate('MovieDetail', { movie: movieDetails, prevRoute: TabScreens.FindNewMovie });
-        }
-    }, []);
+    const showMovieDetails = React.useCallback(
+        async (movieId: MovieResult["id"]) => {
+            setIsLoading(true);
+            const movieDetails = await getMovieDetails(movieId);
+            setIsLoading(false);
+            if (movieDetails) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                navigation.navigate("MovieDetail", {
+                    movie: movieDetails,
+                    prevRoute: TabScreens.New,
+                });
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [],
+    );
 
     const loadMoreData = React.useCallback(() => {
-        fetchMovieResults(selectedMovieCategoryName, true, selectedMovieCategory.currentPage + 1);
+        fetchMovieResults(
+            selectedMovieCategoryName,
+            true,
+            selectedMovieCategory.currentPage + 1,
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedMovieCategory.currentPage]);
 
     return (
@@ -140,8 +171,10 @@ export const NewScreen = (): React.JSX.Element => {
             <SegmentedControl
                 values={movieCategoryNames}
                 selectedIndex={selectedIndex}
-                onChange={(event) => {
-                    segmentedControlChange(event.nativeEvent.selectedSegmentIndex);
+                onChange={event => {
+                    segmentedControlChange(
+                        event.nativeEvent.selectedSegmentIndex,
+                    );
                 }}
             />
             <MovieList
@@ -159,5 +192,3 @@ export const NewScreen = (): React.JSX.Element => {
         </>
     );
 };
-
-const styles = StyleSheet.create({});

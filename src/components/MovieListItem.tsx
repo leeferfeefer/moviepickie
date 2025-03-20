@@ -1,6 +1,13 @@
-import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Image, ActivityIndicator } from "react-native";
-import { IMAGE_URI } from '../services/TMDB.service';
+import React from "react";
+import {
+    Text,
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Image,
+    ActivityIndicator,
+} from "react-native";
+import { IMAGE_URI } from "../services/TMDB.service";
 
 type MovieListItemProps = {
     title: string;
@@ -14,10 +21,7 @@ export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={onPress}
-            >
+            <TouchableOpacity style={styles.button} onPress={onPress}>
                 <View style={styles.imageContainer}>
                     {isLoading && (
                         <ActivityIndicator
@@ -32,7 +36,7 @@ export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
                         onLoadStart={() => setIsLoading(true)}
                         onLoadEnd={() => setIsLoading(false)}
                     />
-                </View>                
+                </View>
                 <Text style={styles.text}>{title}</Text>
             </TouchableOpacity>
         </View>
@@ -40,40 +44,40 @@ export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 10,
-        flex: 1,
-    },
     button: {
-        height: 100,
-        borderColor: 'black',
-        borderWidth: 1,
+        alignItems: "center",
+        borderColor: "black",
         borderRadius: 5,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1
-    },
-    text: {
-        padding: 10,
-        fontSize: 20,
+        borderWidth: 1,
+        flexDirection: "row",
         flex: 1,
+        height: 100,
+        justifyContent: "center",
+    },
+    container: {
+        flex: 1,
+        padding: 10,
     },
     imageContainer: {
-        width: 80,
         height: 80,
         marginHorizontal: 10,
-    },
-    poster: {
         width: 80,
-        height: 80,
-        resizeMode: 'cover',
-        borderRadius: 5,
     },
     loadingIndicator: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
+        left: "50%",
+        position: "absolute",
+        top: "50%",
         transform: [{ translateX: -12 }, { translateY: -12 }],
+    },
+    poster: {
+        borderRadius: 5,
+        height: 80,
+        resizeMode: "cover",
+        width: 80,
+    },
+    text: {
+        flex: 1,
+        fontSize: 20,
+        padding: 10,
     },
 });

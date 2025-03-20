@@ -1,5 +1,5 @@
-import React from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import React from "react";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 export const LoadingIndicator = () => {
     return (
@@ -11,13 +11,13 @@ export const LoadingIndicator = () => {
 
 const styles = StyleSheet.create({
     container: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        left: 0,
+        position: "absolute",
+        right: 0,
+        top: 0,
     },
 });
