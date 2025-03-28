@@ -15,33 +15,35 @@ type MovieListItemProps = {
     onPress: () => void;
 };
 
-export const MovieListItem = (props: MovieListItemProps): React.JSX.Element => {
-    const { title, onPress, posterPath } = props;
-    const [isLoading, setIsLoading] = React.useState(true);
+export const MovieListItem = React.memo(
+    (props: MovieListItemProps): React.JSX.Element => {
+        const { title, onPress, posterPath } = props;
+        const [isLoading, setIsLoading] = React.useState(true);
 
-    return (
-        <View style={styles.container}>
-            <TouchableOpacity style={styles.button} onPress={onPress}>
-                <View style={styles.imageContainer}>
-                    {isLoading && (
-                        <ActivityIndicator
-                            style={styles.loadingIndicator}
-                            size="small"
-                            color="#0000ff"
+        return (
+            <View style={styles.container}>
+                <TouchableOpacity style={styles.button} onPress={onPress}>
+                    <View style={styles.imageContainer}>
+                        {isLoading && (
+                            <ActivityIndicator
+                                style={styles.loadingIndicator}
+                                size="small"
+                                color="#0000ff"
+                            />
+                        )}
+                        <Image
+                            source={{ uri: `${IMAGE_URI}${posterPath}` }}
+                            style={styles.poster}
+                            onLoadStart={() => setIsLoading(true)}
+                            onLoadEnd={() => setIsLoading(false)}
                         />
-                    )}
-                    <Image
-                        source={{ uri: `${IMAGE_URI}${posterPath}` }}
-                        style={styles.poster}
-                        onLoadStart={() => setIsLoading(true)}
-                        onLoadEnd={() => setIsLoading(false)}
-                    />
-                </View>
-                <Text style={styles.text}>{title}</Text>
-            </TouchableOpacity>
-        </View>
-    );
-};
+                    </View>
+                    <Text style={styles.text}>{title}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    },
+);
 
 const styles = StyleSheet.create({
     button: {

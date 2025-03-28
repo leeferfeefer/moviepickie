@@ -16,6 +16,7 @@ export const UnwatchedScreen = (): React.JSX.Element => {
     const movies = useMovieStore(state => state.movies);
     const unwatchedMovies = movies.filter(movie => !movie.watched);
 
+    // make this a hook
     React.useEffect(() => {
         let isSubscribed = true;
         if (isSubscribed) {
@@ -35,22 +36,23 @@ export const UnwatchedScreen = (): React.JSX.Element => {
         return () => {
             isSubscribed = false;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchKeyword]);
+    }, [searchKeyword, unwatchedMovies]);
 
-    const searchUnwatchedMovies = (searchKeyword: string) => {
-        setSearchKeyword(searchKeyword);
-    };
-
-    const showMovieDetails = React.useCallback(async (movie: MovieDetails) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        navigation.navigate("MovieDetail", {
-            movie,
-            prevRoute: TabScreens.Unwatched,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    const searchUnwatchedMovies = React.useCallback((searchText: string) => {
+        setSearchKeyword(searchText);
     }, []);
+
+    const showMovieDetails = React.useCallback(
+        (movie: MovieDetails) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            navigation.navigate("MovieDetail", {
+                movieDetails: movie,
+                prevRoute: TabScreens.Unwatched,
+            });
+        },
+        [navigation],
+    );
 
     return (
         <>

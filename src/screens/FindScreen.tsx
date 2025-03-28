@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SearchBar } from "../components/SearchBar";
-import { searchMovies, getMovieDetails } from "../services/TMDB.service";
+import { searchMovies } from "../services/TMDB.service";
 import { MovieList } from "../components/MovieList";
 import { MovieListItem } from "../components/MovieListItem";
 import { LoadingIndicator } from "../components/FullScreenLoader";
@@ -38,7 +38,7 @@ export const FindScreen = (): React.JSX.Element => {
     );
 
     const showMovieDetails = React.useCallback(
-        async (movieId: MovieResult["id"]) => {
+        (movieId: MovieResult["id"]) => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             navigation.navigate("MovieDetail", {
@@ -46,8 +46,7 @@ export const FindScreen = (): React.JSX.Element => {
                 prevRoute: TabScreens.Find,
             });
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [],
+        [navigation],
     );
 
     const loadMoreData = React.useCallback(() => {

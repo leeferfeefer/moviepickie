@@ -14,6 +14,7 @@ import {
     getMovieTrailerKeys,
     IMAGE_URI,
     getMovieCredits,
+    getMovieDetails,
 } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -23,7 +24,8 @@ type MovieDetailScreenProps = object;
 type MovieDetailScreenRouteProp = RouteProp<
     {
         params: {
-            movieId: number;
+            movieDetails?: MovieDetails;
+            movieId?: MovieResult["id"];
             prevRoute: string;
         };
     },
@@ -35,10 +37,35 @@ export const MovieDetailScreen = (
 ): React.JSX.Element => {
     const navigation = useNavigation();
     const route = useRoute<MovieDetailScreenRouteProp>();
-    const { movieId, prevRoute } = route.params;
+    const { movieId, movieDetails, prevRoute } = route.params;
+    const [isTrailersLoading, setIsTrailersLoading] = React.useState(true);
+    const [isMovieLoading, setIsMovieLoading] = React.useState(
+        movieDetails ? false : true,
+    );
+    const [isCreditsLoading, setIsCreditsLoading] = React.useState(true);
 
-    const [isWatched, setIsWatched] = React.useState(movie.watched);
-    const [isLoading, setIsLoading] = React.useState(false);
+    // if movieDetails is not passed in, fetch it
+    React.useEffect(() => {
+        if (movieId) {
+            console.log("Getting movie details");
+            getMovie();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [movieId]);
+
+    const getMovie = async () => {
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        const movieDetails = await getMovieDetails(movieId!);
+        if (movieDetails) {
+            setMovie(movieDetails);
+            setIsMovieLoading(false);
+        }
+    };
+
+    const [movie, setMovie] = React.useState<MovieDetails | undefined>(movieDetails);
+    const [isWatched, setIsWatched] = React.useState<boolean | undefined>(
+        movie?.watched,
+    );
     const [trailerKeys, setTrailerKeys] = React.useState<string[]>([]);
     const [actors, setActors] = React.useState<MovieCast[]>([]);
     const [loadingCastImages, setLoadingCastImages] = React.useState<{
@@ -49,57 +76,58 @@ export const MovieDetailScreen = (
     const removeMovie = useMovieStore(state => state.removeMovie);
     const toggleWatch = useMovieStore(state => state.toggleWatch);
     const movies = useMovieStore(state => state.movies);
-    const isAdded = movies.some(m => m.id === movie.id);
+    const isAdded = movies.some(m => m.id === movie?.id);
 
     React.useEffect(() => {
         let isSubscribed = true;
-        navigation.setOptions({
-            headerTitle: movie.title,
-        });
-        if (prevRoute !== TabScreens.Watched) {
-            getTrailers(isSubscribed);
-        }
+        if (movie) {
+            navigation.setOptions({
+                headerTitle: movie.title,
+            });
 
-        getCredits(isSubscribed);
+            if (prevRoute !== TabScreens.Watched) {
+                getTrailers(isSubscribed);
+            }
+
+            getCredits(isSubscribed);
+        }
 
         return () => {
             isSubscribed = false;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [movie]);
 
     const getTrailers = async (isSubscribed: boolean) => {
-        setIsLoading(true);
-        const keys = await getMovieTrailerKeys(movie.id);
+        const keys = await getMovieTrailerKeys(movie!.id);
         if (isSubscribed && keys) {
             setTrailerKeys(keys);
-            setIsLoading(false);
+            setIsTrailersLoading(false);
         }
     };
 
     const getCredits = async (isSubscribed: boolean) => {
-        setIsLoading(true);
-        const credits = await getMovieCredits(movie.id);
+        const credits = await getMovieCredits(movie!.id);
         if (isSubscribed && credits) {
             setActors(credits.cast);
-            setIsLoading(false);
+            setIsCreditsLoading(false);
         }
     };
 
     const toggleAdded = React.useCallback(() => {
         if (isAdded) {
-            removeMovie(movie.id);
+            removeMovie(movie!.id);
         } else {
-            addMovie(movie);
+            addMovie(movie!);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdded]);
 
     const toggleWatched = React.useCallback(() => {
         if (!isAdded) {
-            addMovie(movie);
+            addMovie(movie!);
         }
-        toggleWatch(movie.id);
+        toggleWatch(movie!.id);
         setIsWatched(!isWatched);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isWatched]);
@@ -122,116 +150,132 @@ export const MovieDetailScreen = (
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <Image
-                source={{ uri: `${IMAGE_URI}${movie.poster_path}` }}
-                style={styles.poster}
+        <>
+            <ActivityIndicator
+                animating={isMovieLoading}
+                size="large"
+                style={styles.loadingIndicator}
             />
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={toggleAdded}>
-                    <Text style={styles.buttonText}>
-                        {isAdded ? "Remove Movie" : "Add Movie"}
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={toggleWatched}>
-                    <Text style={styles.buttonText}>
-                        {isWatched ? "Unwatch" : "Watch"}
-                    </Text>
-                </TouchableOpacity>
-            </View>
+            {!isMovieLoading && (
+                <ScrollView style={styles.container}>
+                    <Image
+                        source={{ uri: `${IMAGE_URI}${movie!.poster_path}` }}
+                        style={styles.poster}
+                    />
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={toggleAdded}>
+                            <Text style={styles.buttonText}>
+                                {isAdded ? "Remove Movie" : "Add Movie"}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={toggleWatched}>
+                            <Text style={styles.buttonText}>
+                                {isWatched ? "Unwatch" : "Watch"}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
 
-            <Text style={styles.title}>{movie.title}</Text>
-            <Text style={styles.tagline}>{movie.tagline}</Text>
-            <Text style={styles.overview}>{movie.overview}</Text>
-            <Text style={styles.label}>Genres:</Text>
-            <Text>{movie.genres.map(genre => genre.name).join(", ")}</Text>
-            <Text style={styles.label}>Release Date:</Text>
-            <Text>{new Date(movie.release_date).toLocaleDateString()}</Text>
-            <Text style={styles.label}>Runtime:</Text>
-            <Text>{movie.runtime} minutes</Text>
-            <Text style={styles.label}>Production Companies:</Text>
-            <Text>
-                {movie.production_companies
-                    .map(company => company.name)
-                    .join(", ")}
-            </Text>
-            <Text style={styles.label}>Vote Average:</Text>
-            <Text>{movie.vote_average}</Text>
-            <Text style={styles.label}>Vote Count:</Text>
-            <Text style={styles.voteCount}>{movie.vote_count}</Text>
+                    <Text style={styles.title}>{movie!.title}</Text>
+                    <Text style={styles.tagline}>{movie!.tagline}</Text>
+                    <Text style={styles.overview}>{movie!.overview}</Text>
+                    <Text style={styles.label}>Genres:</Text>
+                    <Text>{movie!.genres.map(genre => genre.name).join(", ")}</Text>
+                    <Text style={styles.label}>Release Date:</Text>
+                    <Text>{new Date(movie!.release_date).toLocaleDateString()}</Text>
+                    <Text style={styles.label}>Runtime:</Text>
+                    <Text>{movie!.runtime} minutes</Text>
+                    <Text style={styles.label}>Production Companies:</Text>
+                    <Text>
+                        {movie!.production_companies
+                            .map(company => company.name)
+                            .join(", ")}
+                    </Text>
+                    <Text style={styles.label}>Vote Average:</Text>
+                    <Text>{movie!.vote_average}</Text>
+                    <Text style={styles.label}>Vote Count:</Text>
+                    <Text style={styles.voteCount}>{movie!.vote_count}</Text>
 
-            {prevRoute !== TabScreens.Watched && (
-                <>
-                    <Text style={styles.label}>Trailers:</Text>
-                    <View style={styles.trailerContainer}>
-                        <ActivityIndicator animating={isLoading} size="small" />
-                        {trailerKeys.length === 0 && !isLoading && (
-                            <Text>No trailers available</Text>
-                        )}
-                        {trailerKeys.length > 0 && !isLoading && (
-                            <ScrollView
-                                horizontal
-                                style={styles.videoContainer}>
-                                {trailerKeys.map((key, index) => (
-                                    <View key={index} style={styles.trailer}>
-                                        <YoutubePlayer
-                                            height={300}
-                                            videoId={key}
-                                            play={false}
+                    {prevRoute !== TabScreens.Watched && (
+                        <>
+                            <Text style={styles.label}>Trailers:</Text>
+                            <View style={styles.trailerContainer}>
+                                <ActivityIndicator
+                                    animating={isTrailersLoading}
+                                    size="small"
+                                />
+                                {trailerKeys.length === 0 && !isTrailersLoading && (
+                                    <Text>No trailers available</Text>
+                                )}
+                                {trailerKeys.length > 0 && !isTrailersLoading && (
+                                    <ScrollView
+                                        horizontal
+                                        style={styles.videoContainer}>
+                                        {trailerKeys.map((key, index) => (
+                                            <View key={index} style={styles.trailer}>
+                                                <YoutubePlayer
+                                                    height={300}
+                                                    videoId={key}
+                                                    play={false}
+                                                />
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                )}
+                            </View>
+                        </>
+                    )}
+
+                    <Text style={styles.label}>Cast:</Text>
+                    <FlatList
+                        data={actors}
+                        keyExtractor={item => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                onPress={() => navigateToActorDetail(item)}>
+                                <View style={styles.castItem}>
+                                    <View style={styles.imageContainer}>
+                                        {loadingCastImages[item.id] && (
+                                            <ActivityIndicator
+                                                style={styles.loadingIndicator}
+                                                size="small"
+                                                color="#0000ff"
+                                            />
+                                        )}
+                                        <Image
+                                            source={{
+                                                uri: `${IMAGE_URI}${item.profile_path}`,
+                                            }}
+                                            style={styles.castImage}
+                                            onLoadStart={() =>
+                                                handleCastImageLoadStart(
+                                                    item.id.toString(),
+                                                )
+                                            }
+                                            onLoadEnd={() =>
+                                                handleCastImageLoadEnd(
+                                                    item.id.toString(),
+                                                )
+                                            }
                                         />
                                     </View>
-                                ))}
-                            </ScrollView>
+                                    <Text style={styles.castName}>{item.name}</Text>
+                                    <Text style={styles.castCharacter}>
+                                        {item.character}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
                         )}
-                    </View>
-                </>
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        style={styles.castList}
+                    />
+                </ScrollView>
             )}
-
-            <Text style={styles.label}>Cast:</Text>
-            <FlatList
-                data={actors}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        onPress={() => navigateToActorDetail(item)}>
-                        <View style={styles.castItem}>
-                            <View style={styles.imageContainer}>
-                                {loadingCastImages[item.id] && (
-                                    <ActivityIndicator
-                                        style={styles.loadingIndicator}
-                                        size="small"
-                                        color="#0000ff"
-                                    />
-                                )}
-                                <Image
-                                    source={{
-                                        uri: `${IMAGE_URI}${item.profile_path}`,
-                                    }}
-                                    style={styles.castImage}
-                                    onLoadStart={() =>
-                                        handleCastImageLoadStart(
-                                            item.id.toString(),
-                                        )
-                                    }
-                                    onLoadEnd={() =>
-                                        handleCastImageLoadEnd(
-                                            item.id.toString(),
-                                        )
-                                    }
-                                />
-                            </View>
-                            <Text style={styles.castName}>{item.name}</Text>
-                            <Text style={styles.castCharacter}>
-                                {item.character}
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.castList}
-            />
-        </ScrollView>
+        </>
     );
 };
 

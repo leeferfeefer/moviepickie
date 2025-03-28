@@ -98,9 +98,7 @@ export const ActorDetailScreen = (
     if (!actorDetails) {
         return (
             <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>
-                    Failed to load actor details.
-                </Text>
+                <Text style={styles.errorText}>Failed to load actor details.</Text>
             </View>
         );
     }
@@ -155,9 +153,7 @@ export const ActorDetailScreen = (
                                 }}
                                 style={styles.movieImage}
                                 onLoadStart={() =>
-                                    handleMovieImageLoadStart(
-                                        item.id.toString(),
-                                    )
+                                    handleMovieImageLoadStart(item.id.toString())
                                 }
                                 onLoadEnd={() =>
                                     handleMovieImageLoadEnd(item.id.toString())
@@ -165,9 +161,7 @@ export const ActorDetailScreen = (
                             />
                         </View>
                         <Text style={styles.movieTitle}>{item.title}</Text>
-                        <Text style={styles.movieCharacter}>
-                            {item.character}
-                        </Text>
+                        <Text style={styles.movieCharacter}>{item.character}</Text>
                     </View>
                 )}
                 horizontal

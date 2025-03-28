@@ -1,5 +1,4 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { SearchBar } from "../components/SearchBar";
 import { useNavigation } from "@react-navigation/native";
 import { useMovieStore } from "../zustand/MovieStore";
@@ -17,6 +16,7 @@ export const WatchedScreen = (): React.JSX.Element => {
     const movies = useMovieStore(state => state.movies);
     const watchedMovies = movies.filter(movie => movie.watched);
 
+    // make this a hook
     React.useEffect(() => {
         let isSubscribed = true;
         if (isSubscribed) {
@@ -36,22 +36,23 @@ export const WatchedScreen = (): React.JSX.Element => {
         return () => {
             isSubscribed = false;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchKeyword]);
+    }, [searchKeyword, watchedMovies]);
 
-    const searchWatchedMovies = (searchKeyword: string) => {
-        setSearchKeyword(searchKeyword);
-    };
-
-    const showMovieDetails = React.useCallback(async (movie: MovieDetails) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        navigation.navigate("MovieDetail", {
-            movie,
-            prevRoute: TabScreens.Watched,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    const searchWatchedMovies = React.useCallback((searchText: string) => {
+        setSearchKeyword(searchText);
     }, []);
+
+    const showMovieDetails = React.useCallback(
+        async (movie: MovieDetails) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            navigation.navigate("MovieDetail", {
+                movieDetails: movie,
+                prevRoute: TabScreens.Watched,
+            });
+        },
+        [navigation],
+    );
 
     return (
         <>
