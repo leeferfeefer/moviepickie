@@ -2,16 +2,6 @@ import Config from "react-native-config";
 import axios from "axios";
 import { logError } from "./Error.service";
 
-// axios.interceptors.request.use(request => {
-//   console.log('Starting Request', JSON.stringify(request));
-//   return request;
-// });
-
-// axios.interceptors.response.use(response => {
-//   console.log('Response:', JSON.stringify(response));
-//   return response;
-// });
-
 export const IMAGE_URI = "https://image.tmdb.org/t/p/original";
 
 const tmdbInstance = axios.create({

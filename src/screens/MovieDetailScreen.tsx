@@ -47,7 +47,6 @@ export const MovieDetailScreen = (
     // if movieDetails is not passed in, fetch it
     React.useEffect(() => {
         if (movieId) {
-            console.log("Getting movie details");
             getMovie();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

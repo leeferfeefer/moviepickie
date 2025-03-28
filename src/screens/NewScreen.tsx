@@ -1,5 +1,5 @@
 import React from "react";
-import { MovieList, MovieListProps } from "../components/MovieList";
+import { MovieList } from "../components/MovieList";
 import { MovieListItem } from "../components/MovieListItem";
 import { useNavigation } from "@react-navigation/native";
 import { TabScreens } from "../components/BottomTabBar";
@@ -11,6 +11,7 @@ import {
     getUpcoming,
 } from "../services/TMDB.service";
 import { LoadingIndicator } from "../components/FullScreenLoader";
+import type { FlatList } from "react-native";
 
 const intialMovieCategory: MovieCategory = {
     movieResults: [],
@@ -29,6 +30,8 @@ export const NewScreen = (): React.JSX.Element => {
     const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
+    const movieListRef = React.useRef<FlatList<any>>(null);
+
     const fetchMovieResults = React.useCallback(
         async (options: FetchMovieResultsOptions) => {
             const { isSubscribed, page } = options;
@@ -37,19 +40,6 @@ export const NewScreen = (): React.JSX.Element => {
                 await retrieveMovieResultsMap[
                     movieCategoryNames[selectedIndex]
                 ].retrieveResults(page);
-
-            if (options.onRefresh) {
-                console.log(
-                    "Fetching refresh movie results for: ",
-                    movieCategoryNames[selectedIndex],
-                );
-            } else {
-                console.log(
-                    "Fetching movie results for: ",
-                    movieCategoryNames[selectedIndex],
-                );
-            }
-            console.log("page: ", page);
 
             const movieResultsToMerge = options.onRefresh
                 ? []
@@ -76,7 +66,6 @@ export const NewScreen = (): React.JSX.Element => {
 
     // When refreshing, retrieve the first page results
     const onRefresh = React.useCallback(() => {
-        console.log("refreshing...");
         return fetchMovieResults({
             isSubscribed: true,
             page: 1,
@@ -104,7 +93,7 @@ export const NewScreen = (): React.JSX.Element => {
 
     const segmentedControlChange = React.useCallback((index: number) => {
         setSelectedIndex(index);
-        console.log("selectedMovieCategoryName: ", movieCategoryNames[index]);
+        movieListRef.current?.scrollToIndex({ index: 0, animated: false });
     }, []);
 
     const showMovieDetails = React.useCallback(
@@ -137,6 +126,7 @@ export const NewScreen = (): React.JSX.Element => {
                 }}
             />
             <MovieList
+                ref={movieListRef}
                 onRefresh={onRefresh}
                 data={
                     movieCategories[movieCategoryNames[selectedIndex]].movieResults
