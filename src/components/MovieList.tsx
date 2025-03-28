@@ -64,7 +64,7 @@ export const MovieList = React.memo(
             </>
         );
     },
-);
+) as <T extends object>(props: MovieListProps<T>) => React.JSX.Element;
 
 const styles = StyleSheet.create({
     emptyContainer: {
