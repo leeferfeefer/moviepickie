@@ -1,6 +1,6 @@
 import Config from "react-native-config";
 import axios from "axios";
-import { Alert } from "react-native";
+import { logError } from "./Error.service";
 
 // axios.interceptors.request.use(request => {
 //   console.log('Starting Request', JSON.stringify(request));
@@ -16,7 +16,7 @@ export const IMAGE_URI = "https://image.tmdb.org/t/p/original";
 
 const tmdbInstance = axios.create({
     baseURL: "https://api.themoviedb.org/3",
-    timeout: 5000,
+    timeout: 15000, // Looks like this doesnt work on android? Use timeout and cancel or abort controller as workaround?
     params: {
         api_key: Config.TMDB_API_KEY,
     },
@@ -36,8 +36,7 @@ export const searchMovies = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error searching movies: ", error);
-        Alert.alert("Error", "Error searching movies");
+        logError("Error searching movies", error);
     }
     return undefined;
 };
@@ -49,8 +48,7 @@ export const getMovieDetails = async (
         const response = await tmdbInstance.get(`/movie/${movieId}`);
         return response.data;
     } catch (error) {
-        console.log("Error getting movie detail: ", error);
-        Alert.alert("Error", "Error getting movie details");
+        logError("Error getting movie details information", error);
     }
     return undefined;
 };
@@ -69,8 +67,7 @@ export const getMovieTrailerKeys = async (
         );
         return trailers.map(trailer => trailer.key);
     } catch (error) {
-        console.log("Error getting movie trailer information: ", error);
-        Alert.alert("Error", "Error getting movie trailers");
+        logError("Error getting movie trailer information", error);
     }
     return undefined;
 };
@@ -87,8 +84,7 @@ export const getNowPlaying = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting now playing information: ", error);
-        Alert.alert("Error", "Error getting now playing movies");
+        logError("Error getting now playing information", error);
     }
     return undefined;
 };
@@ -105,8 +101,7 @@ export const getPopular = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting popular information: ", error);
-        Alert.alert("Error", "Error getting popular movies");
+        logError("Error getting popular information", error);
     }
     return undefined;
 };
@@ -123,8 +118,7 @@ export const getTopRated = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting top rated information: ", error);
-        Alert.alert("Error", "Error getting top rated movies");
+        logError("Error getting top rated information", error);
     }
     return undefined;
 };
@@ -141,8 +135,7 @@ export const getUpcoming = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting upcoming information: ", error);
-        Alert.alert("Error", "Error getting upcoming movies");
+        logError("Error getting upcoming information", error);
     }
     return undefined;
 };
@@ -158,8 +151,7 @@ export const getMovieCredits = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting movie credits information: ", error);
-        Alert.alert("Error", "Error getting movie credits");
+        logError("Error getting movie credits information", error);
     }
     return undefined;
 };
@@ -175,8 +167,7 @@ export const getActorDetails = async (
         });
         return response.data;
     } catch (error) {
-        console.log("Error getting actor details information: ", error);
-        Alert.alert("Error", "Error getting actor details");
+        logError("Error getting actor details information", error);
     }
     return undefined;
 };
@@ -185,18 +176,14 @@ export const getActorCredits = async (
     actorId: ActorCast["id"],
 ): Promise<ActorCredits | undefined> => {
     try {
-        const response = await tmdbInstance.get(
-            `/person/${actorId}/movie_credits`,
-            {
-                params: {
-                    language: "en-US",
-                },
+        const response = await tmdbInstance.get(`/person/${actorId}/movie_credits`, {
+            params: {
+                language: "en-US",
             },
-        );
+        });
         return response.data;
     } catch (error) {
-        console.log("Error getting actor credits information: ", error);
-        Alert.alert("Error", "Error getting actor credits");
+        logError("Error getting actor credits information", error);
     }
     return undefined;
 };
