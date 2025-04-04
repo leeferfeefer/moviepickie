@@ -42,7 +42,7 @@ export const MovieDetailScreen = (
     const [isMovieLoading, setIsMovieLoading] = React.useState(
         movieDetails ? false : true,
     );
-    const [isCreditsLoading, setIsCreditsLoading] = React.useState(true);
+    const [isCastLoading, setIsCastLoading] = React.useState(true);
 
     // if movieDetails is not passed in, fetch it
     React.useEffect(() => {
@@ -109,7 +109,7 @@ export const MovieDetailScreen = (
         const credits = await getMovieCredits(movie!.id);
         if (isSubscribed && credits) {
             setActors(credits.cast);
-            setIsCreditsLoading(false);
+            setIsCastLoading(false);
         }
     };
 
@@ -205,6 +205,7 @@ export const MovieDetailScreen = (
                                 <ActivityIndicator
                                     animating={isTrailersLoading}
                                     size="small"
+                                    style={styles.trailerLoadingIndicator}
                                 />
                                 {trailerKeys.length === 0 && !isTrailersLoading && (
                                     <Text>No trailers available</Text>
@@ -229,49 +230,59 @@ export const MovieDetailScreen = (
                     )}
 
                     <Text style={styles.label}>Cast:</Text>
-                    <FlatList
-                        data={actors}
-                        keyExtractor={item => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                onPress={() => navigateToActorDetail(item)}>
-                                <View style={styles.castItem}>
-                                    <View style={styles.imageContainer}>
-                                        {loadingCastImages[item.id] && (
-                                            <ActivityIndicator
-                                                style={styles.loadingIndicator}
-                                                size="small"
-                                                color="#0000ff"
-                                            />
-                                        )}
-                                        <Image
-                                            source={{
-                                                uri: `${IMAGE_URI}${item.profile_path}`,
-                                            }}
-                                            style={styles.castImage}
-                                            onLoadStart={() =>
-                                                handleCastImageLoadStart(
-                                                    item.id.toString(),
-                                                )
-                                            }
-                                            onLoadEnd={() =>
-                                                handleCastImageLoadEnd(
-                                                    item.id.toString(),
-                                                )
-                                            }
-                                        />
-                                    </View>
-                                    <Text style={styles.castName}>{item.name}</Text>
-                                    <Text style={styles.castCharacter}>
-                                        {item.character}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        )}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.castList}
+                    <ActivityIndicator
+                        animating={isCastLoading}
+                        size="small"
+                        style={styles.castLoadingIndicator}
                     />
+                    {!isCastLoading && (
+                        <FlatList
+                            data={actors}
+                            keyExtractor={item => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    onPress={() => navigateToActorDetail(item)}>
+                                    <View style={styles.castItem}>
+                                        <View style={styles.imageContainer}>
+                                            {loadingCastImages[item.id] && (
+                                                <ActivityIndicator
+                                                    style={styles.loadingIndicator}
+                                                    size="small"
+                                                    color="#0000ff"
+                                                />
+                                            )}
+                                            <Image
+                                                source={{
+                                                    uri: `${IMAGE_URI}${item.profile_path}`,
+                                                }}
+                                                style={styles.castImage}
+                                                onLoadStart={() =>
+                                                    handleCastImageLoadStart(
+                                                        item.id.toString(),
+                                                    )
+                                                }
+                                                onLoadEnd={() =>
+                                                    handleCastImageLoadEnd(
+                                                        item.id.toString(),
+                                                    )
+                                                }
+                                            />
+                                        </View>
+                                        <Text style={styles.castName}>
+                                            {item.name}
+                                        </Text>
+                                        <Text style={styles.castCharacter}>
+                                            {item.character}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.castList}
+                        />
+                    )}
+                    <View style={styles.footer} />
                 </ScrollView>
             )}
         </>
@@ -300,6 +311,7 @@ const styles = StyleSheet.create({
     castCharacter: {
         color: "gray",
         fontSize: 12,
+        textAlign: "center",
     },
     castImage: {
         borderRadius: 40,
@@ -313,17 +325,23 @@ const styles = StyleSheet.create({
         width: 100,
     },
     castList: {
-        marginBottom: 50,
         marginTop: 20,
+    },
+    castLoadingIndicator: {
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
     castName: {
         fontSize: 14,
         fontWeight: "bold",
+        textAlign: "center",
     },
     container: {
         backgroundColor: "white",
         flex: 1,
         padding: 10,
+    },
+    footer: {
+        marginBottom: 50,
     },
     imageContainer: {
         height: 80,
@@ -370,6 +388,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginTop: 20,
+    },
+    trailerLoadingIndicator: {
+        transform: [{ translateX: -12 }, { translateY: -12 }],
     },
     videoContainer: {
         flexDirection: "row",

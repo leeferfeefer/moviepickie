@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     imageContainer: {
+        alignItems: "center",
         height: 120,
         position: "relative",
         width: 100,
@@ -215,6 +216,7 @@ const styles = StyleSheet.create({
     movieCharacter: {
         color: "gray",
         fontSize: 12,
+        textAlign: "center",
     },
     movieImage: {
         borderRadius: 5,
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
     movieTitle: {
         fontSize: 14,
         fontWeight: "bold",
+        textAlign: "center",
     },
     name: {
         fontSize: 24,
