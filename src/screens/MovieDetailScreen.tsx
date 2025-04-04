@@ -25,7 +25,7 @@ type MovieDetailScreenRouteProp = RouteProp<
     {
         params: {
             movieDetails?: MovieDetails;
-            movieId?: MovieResult["id"];
+            movieId?: MovieResult["id"] | ActorCast["id"];
             prevRoute: string;
         };
     },
@@ -131,22 +131,25 @@ export const MovieDetailScreen = (
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isWatched]);
 
-    const handleCastImageLoadStart = (id: string) => {
+    const handleCastImageLoadStart = React.useCallback((id: string) => {
         setLoadingCastImages(prevState => ({ ...prevState, [id]: true }));
-    };
+    }, []);
 
-    const handleCastImageLoadEnd = (id: string) => {
+    const handleCastImageLoadEnd = React.useCallback((id: string) => {
         setLoadingCastImages(prevState => ({ ...prevState, [id]: false }));
-    };
+    }, []);
 
-    const navigateToActorDetail = (castMember: MovieCast) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        navigation.navigate("ActorDetail", {
-            actorId: castMember.id,
-            actorName: castMember.name,
-        });
-    };
+    const navigateToActorDetail = React.useCallback(
+        (castMember: MovieCast) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            navigation.navigate("ActorDetail", {
+                actorId: castMember.id,
+                actorName: castMember.name,
+            });
+        },
+        [navigation],
+    );
 
     return (
         <>

@@ -7,6 +7,7 @@ import {
     ScrollView,
     ActivityIndicator,
     FlatList,
+    TouchableOpacity,
 } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import {
@@ -79,13 +80,25 @@ export const ActorDetailScreen = (
         }
     };
 
-    const handleMovieImageLoadStart = (id: string) => {
+    const handleMovieImageLoadStart = React.useCallback((id: string) => {
         setLoadingMovieImages(prevState => ({ ...prevState, [id]: true }));
-    };
+    }, []);
 
-    const handleMovieImageLoadEnd = (id: string) => {
+    const handleMovieImageLoadEnd = React.useCallback((id: string) => {
         setLoadingMovieImages(prevState => ({ ...prevState, [id]: false }));
-    };
+    }, []);
+
+    const navigateToMovieDetail = React.useCallback(
+        (movieId: ActorCast["id"]) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            navigation.navigate("MovieDetail", {
+                movieId,
+                prevRoute: "ActorDetail",
+            });
+        },
+        [navigation],
+    );
 
     if (isLoading) {
         return (
@@ -138,31 +151,35 @@ export const ActorDetailScreen = (
                 data={actorCredits?.cast}
                 keyExtractor={(_item, index) => `${index}`}
                 renderItem={({ item }) => (
-                    <View style={styles.movieItem}>
-                        <View style={styles.imageContainer}>
-                            {loadingMovieImages[item.id] && (
-                                <ActivityIndicator
-                                    style={styles.loadingIndicator}
-                                    size="small"
-                                    color="#0000ff"
+                    <TouchableOpacity onPress={() => navigateToMovieDetail(item.id)}>
+                        <View style={styles.movieItem}>
+                            <View style={styles.imageContainer}>
+                                {loadingMovieImages[item.id] && (
+                                    <ActivityIndicator
+                                        style={styles.loadingIndicator}
+                                        size="small"
+                                        color="#0000ff"
+                                    />
+                                )}
+                                <Image
+                                    source={{
+                                        uri: `${IMAGE_URI}${item.poster_path}`,
+                                    }}
+                                    style={styles.movieImage}
+                                    onLoadStart={() =>
+                                        handleMovieImageLoadStart(item.id.toString())
+                                    }
+                                    onLoadEnd={() =>
+                                        handleMovieImageLoadEnd(item.id.toString())
+                                    }
                                 />
-                            )}
-                            <Image
-                                source={{
-                                    uri: `${IMAGE_URI}${item.poster_path}`,
-                                }}
-                                style={styles.movieImage}
-                                onLoadStart={() =>
-                                    handleMovieImageLoadStart(item.id.toString())
-                                }
-                                onLoadEnd={() =>
-                                    handleMovieImageLoadEnd(item.id.toString())
-                                }
-                            />
+                            </View>
+                            <Text style={styles.movieTitle}>{item.title}</Text>
+                            <Text style={styles.movieCharacter}>
+                                {item.character}
+                            </Text>
                         </View>
-                        <Text style={styles.movieTitle}>{item.title}</Text>
-                        <Text style={styles.movieCharacter}>{item.character}</Text>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 horizontal
                 showsHorizontalScrollIndicator={false}
