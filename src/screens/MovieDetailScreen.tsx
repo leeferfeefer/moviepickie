@@ -15,6 +15,7 @@ import {
     IMAGE_URI,
     getMovieCredits,
     getMovieDetails,
+    getWatchProviders,
 } from "../services/TMDB.service";
 import { useMovieStore } from "../zustand/MovieStore";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -70,6 +71,11 @@ export const MovieDetailScreen = (
     const [loadingCastImages, setLoadingCastImages] = React.useState<{
         [key: string]: boolean;
     }>({});
+    const [watchProviders, setWatchProviders] = React.useState<
+        Providers | undefined
+    >();
+    const [isWatchProvidersLoading, setIsWatchProvidersLoading] =
+        React.useState(true);
 
     const addMovie = useMovieStore(state => state.addMovie);
     const removeMovie = useMovieStore(state => state.removeMovie);
@@ -89,6 +95,7 @@ export const MovieDetailScreen = (
             }
 
             getCredits(isSubscribed);
+            getProviders(isSubscribed);
         }
 
         return () => {
@@ -110,6 +117,14 @@ export const MovieDetailScreen = (
         if (isSubscribed && credits) {
             setActors(credits.cast);
             setIsCastLoading(false);
+        }
+    };
+
+    const getProviders = async (isSubscribed: boolean) => {
+        const providers = await getWatchProviders(movie!.id);
+        if (isSubscribed && providers) {
+            setWatchProviders(providers);
+            setIsWatchProvidersLoading(false);
         }
     };
 
@@ -200,6 +215,27 @@ export const MovieDetailScreen = (
                     <Text>{movie!.vote_average}</Text>
                     <Text style={styles.label}>Vote Count:</Text>
                     <Text style={styles.voteCount}>{movie!.vote_count}</Text>
+
+                    <Text style={styles.label}>Watch Providers:</Text>
+                    <View style={styles.watchProvidersContainer}>
+                        <ActivityIndicator
+                            animating={isWatchProvidersLoading}
+                            size="small"
+                            style={styles.trailerLoadingIndicator}
+                        />
+                        {(watchProviders?.rent ?? []).map(provider => (
+                            <View
+                                key={provider.provider_id}
+                                style={styles.providerItem}>
+                                <Image
+                                    source={{
+                                        uri: `${IMAGE_URI}${provider.logo_path}`,
+                                    }}
+                                    style={styles.providerLogo}
+                                />
+                            </View>
+                        ))}
+                    </View>
 
                     {prevRoute !== TabScreens.Watched && (
                         <>
@@ -371,6 +407,17 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         resizeMode: "cover",
     },
+    providerItem: {
+        alignItems: "center",
+        marginBottom: 10,
+        marginRight: 10,
+    },
+    providerLogo: {
+        borderRadius: 15,
+        height: 30,
+        marginBottom: 5,
+        width: 30,
+    },
     tagline: {
         fontSize: 16,
         fontStyle: "italic",
@@ -400,4 +447,11 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     voteCount: {},
+    watchProvidersContainer: {
+        alignItems: "center",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        marginTop: 10,
+    },
 });

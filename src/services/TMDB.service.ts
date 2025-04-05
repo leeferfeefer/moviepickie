@@ -4,6 +4,8 @@ import { logError } from "./Error.service";
 
 export const IMAGE_URI = "https://image.tmdb.org/t/p/original";
 
+// Movie ID: 817
+
 const tmdbInstance = axios.create({
     baseURL: "https://api.themoviedb.org/3",
     timeout: 15000, // Looks like this doesnt work on android? Use timeout and cancel or abort controller as workaround?
@@ -174,6 +176,20 @@ export const getActorCredits = async (
         return response.data;
     } catch (error) {
         logError("Error getting actor credits information", error);
+    }
+    return undefined;
+};
+
+// Provided by JustWatch
+export const getWatchProviders = async (
+    movieId: MovieDetails["id"],
+): Promise<Providers | undefined> => {
+    try {
+        const response = await tmdbInstance.get(`/movie/${movieId}/watch/providers`);
+        const data = response.data as WatchProvidersResult;
+        return data.results.US;
+    } catch (error) {
+        logError("Error getting watch providers information", error);
     }
     return undefined;
 };

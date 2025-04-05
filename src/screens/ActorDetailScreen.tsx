@@ -20,8 +20,8 @@ import { useNavigation } from "@react-navigation/native";
 type ActorDetailScreenRouteProp = RouteProp<
     {
         params: {
-            actorId: number;
-            actorName: string;
+            actorId: MovieCast["id"];
+            actorName: MovieCast["name"];
         };
     },
     "params"
