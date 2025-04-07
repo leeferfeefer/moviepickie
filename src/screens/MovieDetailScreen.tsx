@@ -57,6 +57,7 @@ export const MovieDetailScreen = (
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const movieDetails = await getMovieDetails(movieId!);
         if (movieDetails) {
+            console.log("Setting movie...", movieDetails);
             setMovie(movieDetails);
             setIsMovieLoading(false);
         }
@@ -134,8 +135,7 @@ export const MovieDetailScreen = (
         } else {
             addMovie(movie!);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAdded]);
+    }, [addMovie, isAdded, movie, removeMovie]);
 
     const toggleWatched = React.useCallback(() => {
         if (!isAdded) {
@@ -143,8 +143,7 @@ export const MovieDetailScreen = (
         }
         toggleWatch(movie!.id);
         setIsWatched(!isWatched);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isWatched]);
+    }, [addMovie, isAdded, isWatched, movie, toggleWatch]);
 
     const handleCastImageLoadStart = React.useCallback((id: string) => {
         setLoadingCastImages(prevState => ({ ...prevState, [id]: true }));
